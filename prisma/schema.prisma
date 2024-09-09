@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://user:geri.softup1@localhost:5432/mydb?secrets_management_system_dev=public"
+  url      = env("DATABASE_URL")
 }
 
 model User {
