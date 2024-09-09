@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id           Int          @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   firstName    String
   lastName     String
   email        String
   password     String
   isConfirmed  Boolean
   is2FaEnabled Boolean
-  Membership   Membership[]
+
+  Membership Membership[]
 }
 
 model Membership {
