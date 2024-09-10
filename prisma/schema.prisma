@@ -10,58 +10,99 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://user:geri.softup1@localhost:5432/mydb?secrets_management_system_dev=public"
+  url      = "postgresql://postgres:1111@localhost:5434/secrets_management_system_dev"
 }
 
 model User {
-  id           Int     @id @default(autoincrement())
-  firstName    String
-  lastName     String
+  id           Int          @id @default(autoincrement())
+  firstName    String       @map("first_name")
+  lastName     String       @map("last_name")
   email        String
   password     String
-  isConfirmed  Boolean
-  is2FaEnabled Boolean
-
-  Membership Membership[]
+  isConfirmed  Boolean?     @map("is_confirmed")
+  is2FaEnabled Boolean      @default(false) @map("is_2fa_enabled")
+  Membership   Membership[]
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
+  deletedAt    DateTime?    @map("deleted_at")
+  @@map("Users")
 }
-
 model Membership {
-  id          Int     @id @default(autoincrement())
-  userId      Int
-  accountId   Int
-  roleId      Int
-  isConfirmed Boolean
-  user        User    @relation(fields: [userId], references: [id])
-  role        Role    @relation(fields: [roleId], references: [id])
-  account     Account @relation(fields: [accountId], references: [id])
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  accountId   Int       @map("account_id")
+  roleId      Int       @map("role_id")
+  isConfirmed Boolean   @map("is_confirmed")
+  user        User      @relation(fields: [userId], references: [id])
+  role        Role      @relation(fields: [roleId], references: [id])
+  account     Account   @relation(fields: [accountId], references: [id])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  @@map("Memberships")
 }
-
 model Role {
   id         Int          @id @default(autoincrement())
-  roleName   UserRoles
+  roleName   UserRoles    @map("role_name")
   Membership Membership[]
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at")
+  deletedAt  DateTime?    @map("deleted_at")
+  @@map("Roles")
 }
-
 model Account {
-  id          Int          @id @default(autoincrement())
-  name        String
-  description String
-  password    String
-  Membership  Membership[]
-  Secret      Secret[]
+  id             Int             @id @default(autoincrement())
+  name           String
+  description    String
+  password       String
+  Membership     Membership[]
+  AccountSecret  AccountSecret[]
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @default(now()) @updatedAt @map("updated_at")
+  deletedAt      DateTime?       @map("deleted_at")
+  accountGiver   SecretShare[]   @relation("accountGiver")
+  accountReciver SecretShare[]   @relation("accountReciver")
+  @@map("Accounts")
 }
-
 model Secret {
-  id          Int     @id @default(autoincrement())
-  name        String
-  value       String
-  description String
-  accountId   Int
-  account     Account @relation(fields: [accountId], references: [id])
+  id            Int             @id @default(autoincrement())
+  name          String
+  value         String
+  description   String
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @default(now()) @updatedAt @map("updated_at")
+  deletedAt     DateTime?       @map("deleted_at")
+  AccountSecret AccountSecret[]
+  SecretsShare  SecretShare[]
+  @@map("Secrets")
 }
-
+model AccountSecret {
+  id        Int     @id @default(autoincrement())
+  accountId Int     @map("account_id")
+  secretId  Int     @map("secret_id")
+  accounts  Account @relation(fields: [accountId], references: [id])
+  secret    Secret  @relation(fields: [secretId], references: [id])
+  @@map("Account_secrets")
+}
+model SecretShare {
+  id                Int      @id @default(autoincrement())
+  expirationTime    DateTime @map("expiration_time")
+  accountGiverId    Int      @map("account_giver_id")
+  accountReceiverId Int      @map("account_receiver_id")
+  numberOfTries     Int      @map("number_of_tries")
+  passcode          Int
+  isAccepted        Boolean  @map("is_accepted")
+  secretId          Int      @map("secret_id")
+  accountGiver      Account  @relation("accountGiver", fields: [accountGiverId], references: [id])
+  accountReceiver   Account  @relation("accountReciver", fields: [accountReceiverId], references: [id])
+  secret            Secret   @relation(fields: [secretId], references: [id])
+  @@map("Secrets_share")
+}
 enum UserRoles {
   ADMIN
   EDITOR
   VIEWER
 }
+
+
+
