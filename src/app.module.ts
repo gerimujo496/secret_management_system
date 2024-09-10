@@ -3,11 +3,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
-import { UserModule } from './user/user.module';
-import { EmailModule } from './email/email.module';
+import { UserModule } from './modules/user/user.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, UserModule, EmailModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    UserModule,
+    EmailModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
