@@ -3,7 +3,6 @@ export const errorMessage = {
     propertyName && propertyValue
       ? `The ${entity} with the given ${propertyName}: ${propertyValue} is not found.`
       : `The ${entity} is not found`,
-  BALANCE_NOT_ENOUGH: `Insufficient balance to complete the purchase`,
 
   INTERNAL_SERVER_ERROR: (action: string, enitity: string) =>
     `Failed to ${action} the ${enitity}`,
@@ -15,4 +14,8 @@ export const errorMessage = {
   CONFLICT_ACCOUNT_CONFIRMED: `Account's email has been confirmed`,
 
   INVALID_TOKEN: `Invalid token`,
+
+  EMAIL_IS_CONFIRMED: 'Email is confirmed',
+
+  EMAIL_IS_NOT_CONFIRMED: 'Email is not confirmed'
 };

@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfirmEmailDto } from './dto/confirm-email.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class UserDal {
@@ -40,6 +41,16 @@ export class UserDal {
 
     return results;
   }
+
+  async resetPassword(id: number, password: string) {
+    const results = await this.prisma.user.update({
+      where: { id, deletedAt: null },
+      data: { password },
+    });
+
+    return results;
+  }
+
   async delete(id: number) {
     const results = await this.prisma.user.delete({
       where: { id, deletedAt: null },

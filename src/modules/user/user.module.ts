@@ -15,7 +15,7 @@ import { AuthHelper } from './auth.helper';
   providers: [UserService, AuthService, UserDal, AuthHelper],
   imports: [
     JwtModule.register({
-      secret: process.env.TOKEN_SECRET_KEY,
+      secret: 'okencwqc',
       signOptions: { expiresIn: '60m' },
     }),
     PrismaModule,

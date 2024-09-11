@@ -9,19 +9,6 @@ import { controller_path } from 'src/constants/controllerPath';
 export class EmailService {
   constructor(private readonly sendGridClient: SendgridClient) {}
 
-  async sendTestEmail(
-    recipient: string,
-    body = 'This is a test mail',
-  ): Promise<void> {
-    const mail: MailDataRequired = {
-      to: recipient,
-      from: 'geri.mujo@softup.co',
-      subject: 'Test email',
-      content: [{ type: 'text/plain', value: body }],
-    };
-    await this.sendGridClient.send(mail);
-  }
-
   async sendConfirmationEmail(
     recipient: string,
     user: CreateUserDto,
@@ -34,6 +21,23 @@ export class EmailService {
       dynamicTemplateData: {
         userName: `${user.firstName} ${user.lastName}`,
         url: `${process.env.HOST}/${controller.AUTH}/${controller_path.AUTH.CONFIRM_EMAIL}?token=${user.confirmationToken}`,
+      },
+    };
+    await this.sendGridClient.send(mail);
+  }
+
+  async sendResetPasswordEmail(
+    recipient: string,
+    user: CreateUserDto,
+  ): Promise<void> {
+    const mail: MailDataRequired = {
+      to: recipient,
+
+      from: 'geri.mujo@softup.co',
+      templateId: 'd-49867ab4ea354ec5ae340808be40427f',
+      dynamicTemplateData: {
+        userName: `${user.firstName} ${user.lastName}`,
+        url: `${process.env.HOST}/${controller.AUTH}/${controller_path.AUTH.RESET_PASSWORD_FORM}?token=${user.confirmationToken}`,
       },
     };
     await this.sendGridClient.send(mail);
