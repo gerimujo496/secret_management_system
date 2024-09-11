@@ -5,17 +5,28 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SecretsDAL } from './secrets.dal';
+import { AccountDAL } from '../account/account.dal';
 import { CreateSecretsDto } from './dtos/create-secrets.dto';
 import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
+import { encrypt, decrypt } from 'src/common/utils/encrypt';
 
 @Injectable()
 export class SecretsService {
-  constructor(private readonly secretsDAL: SecretsDAL) {}
+  constructor(
+    private readonly secretsDAL: SecretsDAL,
+    private readonly accountsDAL: AccountDAL,
+  ) {}
 
   async createSecret(createSecretDto: CreateSecretsDto, accountId: number) {
     try {
+      const account = await this.accountsDAL.findAccountById(accountId);
+      if (!account) {
+        throw new NotFoundException('Account not found');
+      }
+      const encryptedValue = encrypt(createSecretDto.value, account.password);
+
       const createdSecret = await this.secretsDAL.createSecret(
-        createSecretDto,
+        { ...createSecretDto, value: encryptedValue },
         accountId,
       );
       if (!createdSecret) {
@@ -33,7 +44,15 @@ export class SecretsService {
       if (secrets.length === 0) {
         throw new NotFoundException('No secrets found for this account.');
       }
-      return secrets;
+      const account = await this.accountsDAL.findAccountById(accountId);
+    if (!account) {
+      throw new NotFoundException('Account not found.');
+    }
+      const decryptedSecrets = secrets.map(secret => {
+        const decryptedValue = decrypt(secret.value, account.password);
+        return { ...secret, value: decryptedValue };
+      }); 
+      return decryptedSecrets;
     } catch {
       throw new InternalServerErrorException('Failed to retrieve secrets.');
     }
@@ -47,7 +66,12 @@ export class SecretsService {
           'Secret not found or does not belong to this account.',
         );
       }
-      return secret;
+      const account = await this.accountsDAL.findAccountById(accountId);
+    if (!account) {
+      throw new NotFoundException('Account not found.');
+    }
+        const decryptedValue = decrypt(secret.value, account.password);
+        return { ...secret, value: decryptedValue };
     } catch {
       throw new InternalServerErrorException('Failed to retrieve secret.');
     }
@@ -62,6 +86,13 @@ export class SecretsService {
       const secret = await this.findSecretByIdAndAccount(accountId, secretId);
       if (!secret) {
         throw new NotFoundException('Secret not found for this account.');
+      }
+      const account = await this.accountsDAL.findAccountById(accountId);
+      if (!account) {
+        throw new NotFoundException('Account not found.');
+      }
+      if (updateSecretDto.value) {
+        updateSecretDto.value = encrypt(updateSecretDto.value, account.password);
       }
       return await this.secretsDAL.updateSecret(
         secretId,

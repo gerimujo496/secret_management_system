@@ -8,7 +8,10 @@ export class SecretsDAL {
   constructor(private readonly prisma: PrismaService) {}
 
   async createSecret(createSecretDto: CreateSecretsDto, accountId: number) {
+
+   
     return await this.prisma.secret.create({
+        
       data: {
         name: createSecretDto.name,
         description: createSecretDto.description,

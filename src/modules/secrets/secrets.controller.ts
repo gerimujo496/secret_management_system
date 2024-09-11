@@ -24,7 +24,7 @@ export class SecretsController {
     @Param('accountId', ParseIntPipe) accountId: number,
     @Body() createSecretDto: CreateSecretsDto,
   ) {
-    return this.secretsService.createSecret(createSecretDto, accountId);
+    return this.secretsService.createSecret(createSecretDto,accountId);
   }
 
   @Get(':accountId/secrets')
