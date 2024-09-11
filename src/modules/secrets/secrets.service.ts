@@ -1,6 +1,10 @@
-
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { SecretsDAL } from './secrets.dal'; 
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { SecretsDAL } from './secrets.dal';
 import { CreateSecretsDto } from './dtos/create-secrets.dto';
 import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
 
@@ -8,60 +12,83 @@ import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
 export class SecretsService {
   constructor(private readonly secretsDAL: SecretsDAL) {}
 
-  async createSecret(createSecretDto: CreateSecretsDto)  {
-    try{
-        const createdSecret=  await this.secretsDAL.createSecret(createSecretDto);
-        if (!createdSecret) {
-            throw new InternalServerErrorException('Failed to create secret.');
-          }
-          return createdSecret}
-catch{
-    throw new BadRequestException('Could not create secret');}
-
-}
-async getSecrets(){
-    try{
-        const secrets= await this.secretsDAL.findAllSecrets()
-        return secrets
-    }
-    catch{
-        throw new NotFoundException('No secret found')
-    }
-}
-
-async getSecretById(id: number) {
-    try{const secret = await this.secretsDAL.findSecretById(id);
-        
-        if (!secret) {
-          throw new NotFoundException(`Secret with ID ${id} not found`);
-        }
-        console.log(secret)
-        return secret;}
-    catch (error){
-        console.log(error)
-        throw new NotFoundException(`Secret with ID ${id} not found`)
+  async createSecret(createSecretDto: CreateSecretsDto, accountId: number) {
+    try {
+      const createdSecret = await this.secretsDAL.createSecret(
+        createSecretDto,
+        accountId,
+      );
+      if (!createdSecret) {
+        throw new InternalServerErrorException('Failed to create secret.');
+      }
+      return createdSecret;
+    } catch {
+      throw new BadRequestException('Could not create secret');
     }
   }
 
- async updateSecret(id: number, updateSecretDto: UpdateSecretsDto) {
-    try{
-        await this.getSecretById(id); 
-        return this.secretsDAL.updateSecret(id, updateSecretDto);
+  async findAllSecretsByAccount(accountId: number) {
+    try {
+      const secrets = await this.secretsDAL.findAllSecrets(accountId);
+      if (secrets.length === 0) {
+        throw new NotFoundException('No secrets found for this account.');
+      }
+      return secrets;
+    } catch {
+      throw new InternalServerErrorException('Failed to retrieve secrets.');
     }
-   catch{
-    throw new BadRequestException('Could not create secret');
-   }
   }
 
-  async deleteSecret(id: number) {
-    try{
-        await this.getSecretById(id);
-        return this.secretsDAL.deleteSecret(id);
+  async findSecretByIdAndAccount(accountId: number, secretId: number) {
+    try {
+      const secret = await this.secretsDAL.findSecretById(secretId, accountId);
+      if (!secret) {
+        throw new NotFoundException(
+          'Secret not found or does not belong to this account.',
+        );
+      }
+      return secret;
+    } catch {
+      throw new InternalServerErrorException('Failed to retrieve secret.');
     }
-   catch{
-    throw new BadRequestException('Could not delete secret');
-   }
+  }
+
+  async updateSecret(
+    accountId: number,
+    secretId: number,
+    updateSecretDto: UpdateSecretsDto,
+  ) {
+    try {
+      const secret = await this.findSecretByIdAndAccount(accountId, secretId);
+      if (!secret) {
+        throw new NotFoundException('Secret not found for this account.');
+      }
+      return await this.secretsDAL.updateSecret(
+        secretId,
+        updateSecretDto,
+        accountId,
+      );
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to update secret.');
+    }
+  }
+
+  async deleteSecret(accountId: number, secretId: number) {
+    try {
+      const secret = await this.findSecretByIdAndAccount(accountId, secretId);
+      if (!secret) {
+        throw new NotFoundException('Secret not found for this account.');
+      }
+
+      return await this.secretsDAL.deleteSecret(secretId, accountId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to delete secret.');
+    }
   }
 }
-
-

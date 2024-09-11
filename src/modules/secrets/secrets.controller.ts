@@ -1,5 +1,14 @@
-
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { SecretsService } from './secrets.service';
 import { CreateSecretsDto } from './dtos/create-secrets.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -10,30 +19,46 @@ import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
 export class SecretsController {
   constructor(private readonly secretsService: SecretsService) {}
 
-  @Post()
-  async createSecret(@Body() createSecretDto: CreateSecretsDto) {
-
-    return this.secretsService.createSecret(createSecretDto);
+  @Post(':accountId/secrets')
+  async createSecret(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Body() createSecretDto: CreateSecretsDto,
+  ) {
+    return this.secretsService.createSecret(createSecretDto, accountId);
   }
 
-  @Get()
-  getSecrets() {
-    return this.secretsService.getSecrets();
-  }
-  @Get(':id')
-  getSecretById(@Param('id',ParseIntPipe) id: number) {
-    return this.secretsService.getSecretById(id);
+  @Get(':accountId/secrets')
+  async getSecretsByAccount(
+    @Param('accountId', ParseIntPipe) accountId: number,
+  ) {
+    return this.secretsService.findAllSecretsByAccount(accountId);
   }
 
-  @Put(':id')
-  updateSecret(
-    @Param('id',ParseIntPipe) id: number,
+  @Get(':accountId/secrets/:secretId')
+  async getSecretById(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Param('secretId', ParseIntPipe) secretId: number,
+  ) {
+    return this.secretsService.findSecretByIdAndAccount(accountId, secretId);
+  }
+
+  @Patch(':accountId/secrets/:secretId')
+  async updateSecret(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Param('secretId', ParseIntPipe) secretId: number,
     @Body() updateSecretDto: UpdateSecretsDto,
   ) {
-    return this.secretsService.updateSecret(id, updateSecretDto);
+    return this.secretsService.updateSecret(
+      accountId,
+      secretId,
+      updateSecretDto,
+    );
   }
-  @Delete(':id',)
-  deleteSecret(@Param('id',ParseIntPipe) id: number) {
-    return this.secretsService.deleteSecret(id);
+  @Delete(':accountId/secrets/:secretId')
+  async deleteSecret(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Param('secretId', ParseIntPipe) secretId: number,
+  ) {
+    return this.secretsService.deleteSecret(accountId, secretId);
   }
 }
