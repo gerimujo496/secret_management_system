@@ -9,14 +9,18 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserDal } from './user.dal';
 import { EmailModule } from '../email/email.module';
 import { AuthHelper } from './auth.helper';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   controllers: [UserController, AuthController],
   providers: [UserService, AuthService, UserDal, AuthHelper],
   imports: [
-    JwtModule.register({
-      secret: process.env.TOKEN_SECRET_KEY,
-      signOptions: { expiresIn: '60m' },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('TOKEN_SECRET_KEY'),
+        signOptions: { expiresIn: '60m' },
+      }),
     }),
     PrismaModule,
     EmailModule,

@@ -41,6 +41,7 @@ export class AuthService {
 
   async createUser(createUserDto: CreateUserDto) {
     try {
+      console.log(process.env.TOKEN_SECRET_KEY);
       const { email, password } = createUserDto;
 
       const user = await this.usersDal.findByEmail(email);
