@@ -1,12 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { randomBytes, scrypt as _scrypt } from 'crypto';
+import { promisify } from 'util';
+
 import { EmailService } from '../email/email.service';
 import { UserDal } from './user.dal';
-import { errorMessage } from 'src/constants/errorMessages';
-import { Entities } from '../../constants/entities';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { Properties } from 'src/constants/properties';
+import { errorMessage } from '../../constants/error-messages';
+
+const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthHelper {
@@ -25,60 +27,29 @@ export class AuthHelper {
     return await this.jwtService.signAsync(user);
   }
 
-  async updateConfirmationTokenAndReturnNewUser(user: CreateUserDto) {
-    const { firstName, lastName, email } = user;
-
-    const confirmationToken = await this.generateToken({
-      id: user['id'],
-      firstName,
-      lastName,
-      email,
-    });
-
-    const newUser = await this.usersDal.update(user['id'], {
-      confirmationToken,
-    } as UpdateUserDto);
-
-    return newUser;
-  }
   async sendConfirmationEmail(user: CreateUserDto) {
     const { confirmationToken, email } = user;
 
-    await this.emailService.sendConfirmationEmail(email, user);
+    //await this.emailService.sendConfirmationEmail(email, user);
 
     return confirmationToken;
   }
 
   async getTokenPayloadOrThrowError(token: string) {
-    const payload = await this.jwtService.verifyAsync(token);
+    try {
+      const payload = await this.jwtService.verifyAsync(token);
 
-    return payload;
+      return payload;
+    } catch (_error) {
+      throw new UnauthorizedException(errorMessage.INVALID_TOKEN);
+    }
   }
 
-  async getUserFromTokenOrThrowErrorIfTokenIsNotValidOrUserDoNotExists(
-    token: string,
-  ) {
-    const payload = await this.getTokenPayloadOrThrowError(token);
-    const { id } = payload;
-    const user = await this.getUserByIdOrThrowError(id);
+  async generateHashedPassword(password: string) {
+    const salt = randomBytes(8).toString('hex');
+    const hash = (await scrypt(password, salt, 32)) as Buffer;
+    const result = salt + '.' + hash.toString('hex');
 
-    return user;
-  }
-
-  async getUserByIdOrThrowError(id: number) {
-    const user = await this.usersDal.findOneById(id);
-    if (!user)
-      throw new NotFoundException(errorMessage.NOT_FOUND(Entities.USER));
-
-    return user;
-  }
-
-  async getUserIfEmailExistsOrThrowError(email: string) {
-    const user = this.usersDal.findByEmail(email);
-
-    if (!user)
-      throw new NotFoundException(errorMessage.NOT_FOUND(Entities.USER));
-
-    return user;
+    return result;
   }
 }

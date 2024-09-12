@@ -1,3 +1,3 @@
-export enum Properties {
+export enum UserProperties {
   ID = 'id',
 }

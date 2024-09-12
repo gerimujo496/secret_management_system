@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { MailDataRequired } from '@sendgrid/mail';
 import { SendgridClient } from './sendgrid-client';
 import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
-import { controller } from 'src/constants/controller';
-import { controller_path } from 'src/constants/controllerPath';
+import { controller } from '../../constants/controller';
+import { controller_path } from '../../constants/controller-path';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
-  constructor(private readonly sendGridClient: SendgridClient) {}
+  constructor(
+    private readonly sendGridClient: SendgridClient,
+    private configService: ConfigService,
+  ) {}
 
   async sendConfirmationEmail(
     recipient: string,
@@ -15,8 +19,7 @@ export class EmailService {
   ): Promise<void> {
     const mail: MailDataRequired = {
       to: recipient,
-
-      from: 'geri.mujo@softup.co',
+      from: this.configService.get<string>('MAIL_CONFIG_SENDER'),
       templateId: 'd-c5ead45ced5745f196cbc2cc354d438a',
       dynamicTemplateData: {
         userName: `${user.firstName} ${user.lastName}`,
@@ -32,7 +35,6 @@ export class EmailService {
   ): Promise<void> {
     const mail: MailDataRequired = {
       to: recipient,
-
       from: 'geri.mujo@softup.co',
       templateId: 'd-49867ab4ea354ec5ae340808be40427f',
       dynamicTemplateData: {

@@ -13,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { controller } from '../../constants/controller';
-import { controller_path } from '../../constants/controllerPath';
+import { controller_path } from '../../constants/controller-path';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LogInUserDto } from './dto/login-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -48,6 +48,7 @@ export class AuthController {
   async requestToResetPassword(@Query('email') email: string) {
     return await this.authService.requestToResetPassword(email);
   }
+
   @Get(controller_path.AUTH.RESET_PASSWORD_FORM)
   @Render('reset-password.hbs')
   async resetForm(@Query('token') token: string) {

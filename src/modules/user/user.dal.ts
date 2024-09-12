@@ -1,61 +1,111 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfirmEmailDto } from './dto/confirm-email.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { errorMessage } from '../../constants/error-messages';
+import { Entities } from '../../constants/entities';
 
 @Injectable()
 export class UserDal {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    return await this.prisma.user.create({ data: createUserDto });
+    try {
+      return await this.prisma.user.create({ data: createUserDto });
+    } catch (_error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('create', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async findByEmail(email: string) {
-    const user = await this.prisma.user.findFirst({
-      where: { email: email, deletedAt: null },
-    });
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { email: email, deletedAt: null },
+      });
 
-    return user;
+      return user;
+    } catch (_error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('get by email', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async getAllUsers() {
-    return await this.prisma.user.findMany({ where: { deletedAt: null } });
+    try {
+      return await this.prisma.user.findMany({ where: { deletedAt: null } });
+    } catch (_error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('get all', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async findOneById(id: number) {
-    const user = await this.prisma.user.findFirst({
-      where: { id: id, deletedAt: null },
-    });
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { id: id, deletedAt: null },
+      });
 
-    return user;
+      return user;
+    } catch (_error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('find', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async update(id: number, updateUserDto: UpdateUserDto | ConfirmEmailDto) {
-    const results = await this.prisma.user.update({
-      where: { id, deletedAt: null },
-      data: updateUserDto,
-    });
+    try {
+      const results = await this.prisma.user.update({
+        where: { id, deletedAt: null },
+        data: updateUserDto,
+      });
 
-    return results;
+      return results;
+    } catch (_error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('update', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async resetPassword(id: number, password: string) {
-    const results = await this.prisma.user.update({
-      where: { id, deletedAt: null },
-      data: { password },
-    });
+    try {
+      const results = await this.prisma.user.update({
+        where: { id, deletedAt: null },
+        data: { password },
+      });
 
-    return results;
+      return results;
+    } catch (_error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('reset', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async delete(id: number) {
-    const results = await this.prisma.user.delete({
-      where: { id, deletedAt: null },
-    });
+    try {
+      const results = await this.prisma.user.delete({
+        where: { id, deletedAt: null },
+      });
 
-    return results;
+      return results;
+    } catch (_error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('delete', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

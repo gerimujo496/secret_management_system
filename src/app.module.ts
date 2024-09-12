@@ -8,7 +8,10 @@ import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.dev' }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env.dev',
+    }),
     PrismaModule,
     UserModule,
     EmailModule,
