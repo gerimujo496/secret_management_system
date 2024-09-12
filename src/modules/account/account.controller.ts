@@ -30,13 +30,13 @@ export class AccountController {
   }
 
   @Get('/:accountId')
-  @Roles(UserRoles.ADMIN, UserRoles.EDITOR)
+  @Roles(UserRoles.ADMIN)
   getMyAccount(@Param('accountId') accountId: string, @Request() req: any) {
     return this.accountService.getMyAccount(req.user?.id, parseInt(accountId));
   }
 
   @Get('/:accountId/users')
-  @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.EDITOR, UserRoles.VIEWER)
   getAccountUsers(@Param('accountId') accountId: string) {
     return this.accountService.getAccountUsers(parseInt(accountId));
   }
