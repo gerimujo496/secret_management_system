@@ -14,46 +14,45 @@ import { CreateAccountDto } from './dtos/create-account.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { UpdateAccountDto } from './dtos/update-account.dto';
 
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRoles } from '@prisma/client';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+
 @Controller('account')
-// @UseGuards(AuthGuard) // apply when log in feature
+@UseGuards(AuthGuard)
+@UseGuards(RolesGuard)
 export class AccountController {
   constructor(private accountService: AccountService) {}
 
   @Post()
   createAccount(@Body() body: CreateAccountDto, @Request() req: any) {
-    const userId = req.user?.id || 1;
-    return this.accountService.createAccount(body, userId);
+    return this.accountService.createAccount(body, req.user?.id);
   }
 
   @Get('/:accountId')
+  @Roles(UserRoles.ADMIN, UserRoles.EDITOR)
   getMyAccount(@Param('accountId') accountId: string, @Request() req: any) {
-    const userId = req.user?.id || 1;
-    return this.accountService.getMyAccount(userId, parseInt(accountId));
+    return this.accountService.getMyAccount(req.user?.id, parseInt(accountId));
   }
 
   @Get('/:accountId/users')
-  getAccountUsers(@Param('accountId') accountId: string, @Request() req: any) {
-    const userId = req.user?.id || 1;
-    return this.accountService.getAccountUsers(parseInt(accountId), userId);
+  @Roles(UserRoles.ADMIN)
+  getAccountUsers(@Param('accountId') accountId: string) {
+    return this.accountService.getAccountUsers(parseInt(accountId));
   }
 
   @Patch('/:accountId')
+  @Roles(UserRoles.ADMIN)
   updateAccount(
     @Param('accountId') accountId: string,
     @Body() body: UpdateAccountDto,
-    @Request() req: any,
   ) {
-    const userId = req.user?.id || 2;
-    return this.accountService.updateAccount({
-      accountId: parseInt(accountId),
-      newAccountInformation: body,
-      userId,
-    });
+    return this.accountService.updateAccount(parseInt(accountId), body);
   }
 
   @Delete('/:accountId')
-  deleteAccount(@Param('accountId') accountId: string, @Request() req: any) {
-    const userId = req.user?.id || 1;
-    return this.accountService.deleteAccount(parseInt(accountId), userId);
+  @Roles(UserRoles.ADMIN)
+  deleteAccount(@Param('accountId') accountId: string) {
+    return this.accountService.deleteAccount(parseInt(accountId));
   }
 }

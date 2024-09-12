@@ -1,30 +1,23 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateAccountDto } from './dtos/create-account.dto';
 import { generate } from 'generate-password';
-import { AccountDal } from './account.dal';
 import { UserRoles } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateAccountDto } from './dtos/update-account.dto';
-
-interface UpdateAccount {
-  accountId: number;
-  userId: number;
-  newAccountInformation: UpdateAccountDto;
-}
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class AccountService {
-  constructor(
-    private prisma: PrismaService,
-    private accountDal: AccountDal,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async createAccount(data: CreateAccountDto, userId: number) {
     try {
+      if (!userId) return null;
+
+      if (Object.keys(data).length === 0) {
+        throw new BadRequestException('No data provided.');
+      }
+
       const password = generate({
         length: 15,
         numbers: true,
@@ -54,17 +47,19 @@ export class AccountService {
 
       return account;
     } catch (error) {
-      return new Error(error.message);
+      return new ExceptionsHandler(error.response);
     }
   }
 
   async getMyAccount(userId: number, accountId: number) {
     try {
+      if (!userId || !accountId) return null;
+
       const membership = await this.prisma.membership.findFirst({
         where: {
           accountId,
           userId,
-          role: { roleName: UserRoles.ADMIN },
+          isConfirmed: true,
           deletedAt: null,
         },
       });
@@ -77,25 +72,16 @@ export class AccountService {
         where: { id: accountId },
       });
     } catch (error) {
-      return new Error(error.message);
+      return new ExceptionsHandler(error.response);
     }
   }
 
-  async getAccountUsers(accountId: number, userId: number) {
+  async getAccountUsers(accountId: number) {
     try {
       if (!accountId) return null;
 
-      const accountAdmin = await this.accountDal.findAdminAccount(
-        accountId,
-        userId,
-      );
-
-      if (!accountAdmin) {
-        throw new ForbiddenException('Forbidden access.');
-      }
-
       const usersList = await this.prisma.membership.findMany({
-        where: { accountId, deletedAt: null },
+        where: { accountId, deletedAt: null, isConfirmed: true },
         select: {
           role: {
             select: {
@@ -115,56 +101,44 @@ export class AccountService {
 
       return usersList || [];
     } catch (error) {
-      return new Error(error.message);
+      return new ExceptionsHandler(error.response);
     }
   }
 
-  async updateAccount({
-    accountId,
-    newAccountInformation,
-    userId,
-  }: UpdateAccount) {
-    if (!accountId) return null;
-
-    if (Object.keys(newAccountInformation).length === 0) {
-      throw new BadRequestException('No data provided.');
-    }
-
-    const accountAdmin = await this.accountDal.findAdminAccount(
-      accountId,
-      userId,
-    );
-
-    if (!accountAdmin) {
-      throw new ForbiddenException('Forbidden access.');
-    }
-
-    const currentAccount = await this.accountDal.findAccount(accountId);
-
-    if (!currentAccount) {
-      throw new BadRequestException('Bad request.');
-    }
-
-    return await this.prisma.account.update({
-      where: { id: currentAccount.id },
-      data: { ...newAccountInformation },
-    });
-  }
-
-  async deleteAccount(accountId: number, userId: number) {
+  async updateAccount(
+    accountId: number,
+    newAccountInformation: UpdateAccountDto,
+  ) {
     try {
       if (!accountId) return null;
 
-      const adminMembership = await this.prisma.membership.findFirst({
-        where: { accountId, userId, deletedAt: null },
-      });
-
-      if (!adminMembership) {
-        throw new ForbiddenException('Forbidden access.');
+      if (Object.keys(newAccountInformation).length === 0) {
+        throw new BadRequestException('No data provided.');
       }
 
+      const currentAccount = await this.prisma.account.findFirst({
+        where: { id: accountId, deletedAt: null },
+      });
+
+      if (!currentAccount) {
+        throw new BadRequestException('Bad request.');
+      }
+
+      return await this.prisma.account.update({
+        where: { id: currentAccount.id },
+        data: { ...newAccountInformation },
+      });
+    } catch (error) {
+      return new ExceptionsHandler(error.response);
+    }
+  }
+
+  async deleteAccount(accountId: number) {
+    try {
+      if (!accountId) return null;
+
       const memberships = await this.prisma.membership.findMany({
-        where: { accountId, deletedAt: null },
+        where: { accountId, isConfirmed: true, deletedAt: null },
       });
 
       if (memberships.length === 0) {
@@ -179,7 +153,7 @@ export class AccountService {
         where: { id: accountId, deletedAt: null },
       });
     } catch (error) {
-      return new Error(error.message);
+      return new ExceptionsHandler(error.response);
     }
   }
 }

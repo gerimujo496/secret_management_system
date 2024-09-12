@@ -5,32 +5,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
-import { AccountDal } from '../account/account.dal';
 import { PrismaService } from '../prisma/prisma.service';
-
-interface UpdateMembership {
-  accountId: number;
-  adminId: number;
-  userId: number;
-  role: string;
-}
-
-interface DeleteMembership {
-  accountId: number;
-  membershipId: number;
-  userId: number;
-}
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class MembershipService {
-  constructor(
-    private prisma: PrismaService,
-    private accountDal: AccountDal,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async updateUserRole({ accountId, adminId, userId, role }: UpdateMembership) {
+  async updateUserRole({ accountId, userId, role }: UpdateMembership) {
     try {
-      if (!userId || !accountId || !adminId) return null;
+      if (!userId || !accountId) return null;
 
       const roleUpperCase = role.toUpperCase();
 
@@ -41,20 +25,12 @@ export class MembershipService {
         return new BadRequestException('Bad Request.');
       }
 
-      const adminAccount = await this.accountDal.findAdminAccount(
-        accountId,
-        adminId,
-      );
-
-      if (!adminAccount) {
-        throw new ForbiddenException('Forbidden access.');
-      }
-
       const membership = await this.prisma.membership.findFirst({
         where: {
           accountId,
           userId,
           deletedAt: null,
+          isConfirmed: true,
           role: { roleName: { not: UserRoles.ADMIN } },
         },
         select: {
@@ -69,7 +45,7 @@ export class MembershipService {
       });
 
       if (!membership) {
-        throw new BadRequestException('Membership not found.');
+        throw new BadRequestException('Bad request.');
       }
 
       const roleRecord = await this.prisma.role.findFirst({
@@ -88,29 +64,20 @@ export class MembershipService {
 
       return updateUserRole;
     } catch (error) {
-      return new Error(error.message);
+      return new ExceptionsHandler(error.response);
     }
   }
 
-  async deleteMembership({
-    membershipId,
-    accountId,
-    userId,
-  }: DeleteMembership) {
+  async deleteMembership(membershipId: number, accountId: number) {
     try {
-      if (!membershipId || !accountId || !userId) return null;
-
-      const adminAccount = await this.accountDal.findAdminAccount(
-        accountId,
-        userId,
-      );
-
-      if (!adminAccount) {
-        throw new ForbiddenException('Forbidden access.');
-      }
+      if (!membershipId || !accountId) return null;
 
       const membership = await this.prisma.membership.findFirst({
-        where: { id: membershipId, deletedAt: null },
+        where: {
+          id: membershipId,
+          isConfirmed: true,
+          deletedAt: null,
+        },
         select: {
           id: true,
           role: {
@@ -133,7 +100,7 @@ export class MembershipService {
         where: { id: membership.id },
       });
     } catch (error) {
-      return new Error(error.message);
+      return new ExceptionsHandler(error.response);
     }
   }
 }
