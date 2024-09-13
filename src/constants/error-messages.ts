@@ -17,5 +17,13 @@ export const errorMessage = {
 
   EMAIL_IS_CONFIRMED: 'Email is confirmed',
 
-  EMAIL_IS_NOT_CONFIRMED: 'Email is not confirmed'
+  EMAIL_IS_NOT_CONFIRMED: 'Email is not confirmed',
+
+  USER_2FA_IS_ENABLED:
+    'Two factor authentication is enabled, please login through the 2fa endpoint and provide the code',
+
+  USER_2FA_NOT_ENABLED:
+    'Two factor authentication is not enabled, please login through the login endpoint ',
+
+  WRONG_AUTH_CODE: 'Wrong authentication code',
 };

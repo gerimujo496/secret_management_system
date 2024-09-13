@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
@@ -9,7 +10,7 @@ import { PrismaModule } from '../../prisma/prisma.module';
 import { UserDal } from './user.dal';
 import { EmailModule } from '../email/email.module';
 import { AuthHelper } from './auth.helper';
-import { ConfigService } from '@nestjs/config';
+import { PassportModule } from '../../modules/passport/passport.module';
 
 @Module({
   controllers: [UserController, AuthController],
@@ -24,6 +25,8 @@ import { ConfigService } from '@nestjs/config';
     }),
     PrismaModule,
     EmailModule,
+    forwardRef(() => PassportModule),
   ],
+  exports: [AuthService, UserDal],
 })
 export class UserModule {}

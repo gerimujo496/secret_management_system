@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfirmEmailDto } from './dto/confirm-email.dto';
 import { errorMessage } from '../../constants/error-messages';
 import { Entities } from '../../constants/entities';
+import { JsonValue } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class UserDal {
@@ -104,6 +105,38 @@ export class UserDal {
     } catch (_error) {
       throw new HttpException(
         errorMessage.INTERNAL_SERVER_ERROR('delete', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async setSecretKey(id: number, key: JsonValue) {
+    try {
+      const result = await this.prisma.user.update({
+        where: { id },
+        data: { twoFactorAuthenticationSecret: key },
+      });
+
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('update secret  key', Entities.USER),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async activate2Fa(id: number) {
+    try {
+      const result = await this.prisma.user.update({
+        where: { id },
+        data: { isTwoFactorAuthenticationEnabled: true },
+      });
+
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        errorMessage.INTERNAL_SERVER_ERROR('activate 2fa', Entities.USER),
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { JsonValue } from '@prisma/client/runtime/library';
 import {
   IsString,
   MaxLength,
@@ -8,6 +9,8 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
+  id: number;
+
   @ApiProperty()
   @IsString()
   @MaxLength(20, { message: 'First name must be at most 20 characters' })
@@ -33,4 +36,8 @@ export class CreateUserDto {
   password: string;
 
   confirmationToken: string = null;
+
+  twoFactorAuthenticationSecret?: JsonValue;
+
+  isTwoFactorAuthenticationEnabled?: boolean;
 }

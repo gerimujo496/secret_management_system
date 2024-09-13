@@ -8,5 +8,8 @@ export const controller_path = {
     REQUEST_RESET_PASSWORD: 'request_reset_password',
     RESET_PASSWORD_FORM: 'reset_password_form',
     RESET_PASSWORD: 'reset_password',
+    TWO_FA_AUTHENTICATE: 'two_fa_authenticate',
+    TWO_FA_INIT: 'two_fa_init',
+    TWO_FA_ACTIVATE: 'two_fa_activate',
   },
 };

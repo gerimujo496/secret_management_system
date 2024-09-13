@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id                Int      @id @default(autoincrement())
-  firstName         String   @map("first_name")
-  lastName          String   @map("last_name")
-  email             String
-  password          String
-  confirmationToken String?  @map("confirmation_token") 
-  isConfirmed       Boolean? @map("is_confirmed")
-  is2FaEnabled      Boolean  @default(false) @map("is_2fa_enabled")
+  id                               Int      @id @default(autoincrement())
+  firstName                        String   @map("first_name")
+  lastName                         String   @map("last_name")
+  email                            String
+  password                         String
+  confirmationToken                String?  @map("confirmation_token")
+  isConfirmed                      Boolean? @map("is_confirmed")
+  twoFactorAuthenticationSecret    Json?    @map("two_fa_secret")
+  isTwoFactorAuthenticationEnabled Boolean  @default(false) @map("is_2fa_enabled")
 
   Membership Membership[]
 

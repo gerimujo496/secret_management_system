@@ -3,11 +3,10 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   Query,
   Render,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -15,8 +14,12 @@ import { AuthService } from './auth.service';
 import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
 import { CreateUserDto } from './dto/create-user.dto';
+import { TwoFaCodeDto } from './dto/two-fa-code.dto';
 import { LogInUserDto } from './dto/login-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
+import { User } from '../../common/customDecorators/user.decorator';
+import { Login2FaDto } from './dto/login-fa.dto';
 
 @Controller(controller.AUTH)
 @ApiTags(controller.AUTH)
@@ -62,5 +65,25 @@ export class AuthController {
     @Body() resetPassword: ResetPasswordDto,
   ) {
     return await this.authService.resetPassword(token, resetPassword);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(controller_path.AUTH.TWO_FA_INIT)
+  async twoFaInit(@User() user: CreateUserDto) {
+    return await this.authService.initTwoFa(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(controller_path.AUTH.TWO_FA_ACTIVATE)
+  async twoFaActivate(@User() user: CreateUserDto, @Body() twoFaCodeDto: any) {
+    return await this.authService.twoFaActivate(
+      user.id,
+      twoFaCodeDto.twoFactorAuthenticationSecret,
+    );
+  }
+
+  @Post(controller_path.AUTH.TWO_FA_AUTHENTICATE)
+  async twoFaAuthenticate(@Body() login2fa: Login2FaDto) {
+    return await this.authService.twoFaAuthenticate(login2fa);
   }
 }
