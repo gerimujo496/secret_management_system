@@ -93,7 +93,7 @@ model SecretShare {
   accountGiverId    Int      @map("account_giver_id")
   accountReceiverId Int      @map("account_receiver_id")
   numberOfTries     Int      @map("number_of_tries")
-  passcode          Int
+  passcode          Int?  
   isAccepted        Boolean  @map("is_accepted")
   secretId          Int      @map("secret_id")
   accountGiver      Account  @relation("accountGiver", fields: [accountGiverId], references: [id])

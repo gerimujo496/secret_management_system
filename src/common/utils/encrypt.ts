@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, scrypt, scryptSync } from 'crypto';
+import { createCipheriv, createDecipheriv,scryptSync } from 'crypto';
 
 export function encrypt(value: string, password: string) {
   const key = scryptSync(password, 'salt', 32);
@@ -14,5 +14,7 @@ export function decrypt(encryptedData: string, password: string) {
     decipher.update(Buffer.from(encryptedData, 'hex')),
     decipher.final(),
   ]);
+
   return decryptedData.toString();
 }
+
