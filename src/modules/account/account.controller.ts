@@ -19,7 +19,7 @@ import { UserRoles } from '@prisma/client';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('account')
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class AccountController {
   constructor(private accountService: AccountService) {}

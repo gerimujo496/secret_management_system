@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAccountDto } from './dtos/create-account.dto';
 import { generate } from 'generate-password';
 import { UserRoles } from '@prisma/client';

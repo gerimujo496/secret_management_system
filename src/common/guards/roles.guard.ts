@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -28,8 +29,11 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const userId = request.user?.id;
-
     const accountId = request.params.accountId;
+
+    // if (!userId || !accountId) {
+    //   throw new ForbiddenException('Forbidden resource.');
+    // }
 
     const memberships = await this.prisma.membership.findMany({
       where: {
