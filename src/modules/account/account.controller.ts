@@ -26,7 +26,8 @@ export class AccountController {
 
   @Post()
   createAccount(@Body() body: CreateAccountDto, @Request() req: any) {
-    return this.accountService.createAccount(body, req.user?.id);
+    const userId = req.user?.id || 1;
+    return this.accountService.createAccount(body, userId);
   }
 
   @Get('/:accountId')

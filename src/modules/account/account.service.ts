@@ -18,6 +18,14 @@ export class AccountService {
     try {
       if (!userId) return null;
 
+      const user = await this.prisma.user.findFirst({
+        where: { id: userId, isConfirmed: true },
+      });
+
+      if (!user) {
+        throw new NotFoundException('Invalid user or not found.');
+      }
+
       if (Object.keys(data).length === 0) {
         throw new BadRequestException('No data provided.');
       }
@@ -51,7 +59,7 @@ export class AccountService {
 
       return account;
     } catch (error) {
-      return new ExceptionsHandler(error.response);
+      return new ExceptionsHandler(error);
     }
   }
 

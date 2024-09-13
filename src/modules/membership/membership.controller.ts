@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Request,
+  Render,
 } from '@nestjs/common';
 import { UpdateRoleDto } from './dtos/update-role.dto';
 import { MembershipService } from './membership.service';
@@ -24,6 +25,7 @@ export class MembershipController {
   constructor(private membershipService: MembershipService) {}
 
   @Get('/confirm')
+  @Render('index')
   confirmInvitation(@Query() query: any) {
     return this.membershipService.confirmInvitation(
       parseInt(query.membershipId),

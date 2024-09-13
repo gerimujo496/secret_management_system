@@ -196,7 +196,13 @@ export class MembershipService {
       url: invitationUrl,
     });
 
-    return 'Email was sent successfully.';
+    return {
+      view: 'index',
+      data: {
+        title: 'Invitation accepted.',
+        message: `Your membership invitatation to the account of ${admin.user.firstName} ${admin.user.lastName} was successfully accepted.`,
+      },
+    };
   }
 
   async confirmInvitation(membershipId: number) {
