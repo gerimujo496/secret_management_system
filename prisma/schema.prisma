@@ -23,7 +23,7 @@ model User {
   isConfirmed       Boolean? @map("is_confirmed")
   is2FaEnabled      Boolean  @default(false) @map("is_2fa_enabled")
 
-  Membership Membership[]
+  Membership Memberships[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
@@ -31,7 +31,7 @@ model User {
 
   @@map("Users")
 }
-model Membership {
+model Memberships {
   id          Int     @id @default(autoincrement())
   userId      Int     @map("user_id")
   accountId   Int     @map("account_id")
@@ -51,7 +51,7 @@ model Membership {
 model Role {
   id         Int          @id @default(autoincrement())
   roleName   UserRoles    @map("role_name")
-  Membership Membership[]
+  Membership Memberships[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
@@ -65,7 +65,7 @@ model Account {
   description String
   password    String
 
-  Membership    Membership[]
+  Membership    Memberships[]
   AccountSecret AccountSecret[]
 
   createdAt      DateTime      @default(now()) @map("created_at")
