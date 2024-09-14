@@ -1,14 +1,22 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserDal } from '../../user/user.dal';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly userDal: UserDal) {
+  constructor(
+    private readonly userDal: UserDal,
+    private configService: ConfigService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'okencwqc',
+      secretOrKey: configService.get<string>('TOKEN_SECRET_KEY'),
     });
   }
 
@@ -16,6 +24,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userDal.findByEmail(payload.email);
 
     if (user) {
+      if (
+        user.isTwoFactorAuthenticationEnabled &&
+        !payload.isTwoFactorAuthenticated
+      )
+        throw new UnauthorizedException();
       return user;
     }
   }

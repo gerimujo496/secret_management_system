@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
-import { UserModule } from '../user/user.module';
+import { AuthService } from '../modules/auth/auth.service';
+import { UserModule } from '../modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import { PrismaService } from '../../prisma/prisma.service';
+import { CreateUserDto } from '../modules/auth/dto/create-user.dto';
+import { PrismaService } from '../modules/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserDal } from '../user/user.dal';
+import { UserDal } from '../modules/user/user.dal';
 import {
   ConflictException,
   ForbiddenException,
@@ -13,14 +13,14 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { errorMessage } from '../../constants/error-messages';
-import { AuthHelper } from './auth.helper';
-import { Entities } from '../../constants/entities';
-import { EmailService } from '../email/email.service';
-import { controller } from '../../constants/controller';
-import { controller_path } from '../../constants/controller-path';
-import { ResetPasswordDto } from '../user/dto/reset-password.dto';
-import { LogInUserDto } from '../user/dto/login-user.dto';
+import { errorMessage } from '../constants/error-messages';
+import { AuthHelper } from '../modules/auth/auth.helper';
+import { Entities } from '../constants/entities';
+import { EmailService } from '../modules/email/email.service';
+import { controller } from '../constants/controller';
+import { controller_path } from '../constants/controller-path';
+import { ResetPasswordDto } from '../modules/auth/dto/reset-password.dto';
+import { LogInUserDto } from '../modules/auth/dto/login-user.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -149,8 +149,12 @@ describe('AuthService', () => {
   it('confirmation token should be generated and user should be updated with the token', async () => {
     const token = await authHelper.generateToken({
       id: createdUser.id,
-      ...user,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
+
     jest
       .spyOn(userDal, 'update')
       .mockResolvedValue({ ...createdUser, confirmationToken: token });
@@ -168,7 +172,10 @@ describe('AuthService', () => {
   it('confirmEmail must send the email and make the update if token is valid and user exists', async () => {
     const confirmationToken = await authHelper.generateToken({
       id: createdUser.id,
-      ...user,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
 
     jest
@@ -198,7 +205,10 @@ describe('AuthService', () => {
   it('confirmEmail: it should throw error if user decoded by token does not exists', async () => {
     const confirmationToken = await authHelper.generateToken({
       id: createdUser.id,
-      ...user,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
 
     jest
@@ -222,7 +232,10 @@ describe('AuthService', () => {
   it('confirmEmail: it should throw error if user decoded by token is confirmed', async () => {
     const confirmationToken = await authHelper.generateToken({
       id: createdUser.id,
-      ...user,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
 
     jest

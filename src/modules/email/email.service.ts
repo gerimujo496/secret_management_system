@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MailDataRequired } from '@sendgrid/mail';
 import { SendgridClient } from './sendgrid-client';
-import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
 import { ConfigService } from '@nestjs/config';

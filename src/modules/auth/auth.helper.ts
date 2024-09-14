@@ -7,7 +7,7 @@ import * as QRCode from 'qrcode';
 
 import { EmailService } from '../email/email.service';
 import { UserDal } from '../user/user.dal';
-import { CreateUserDto } from '../user/dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { errorMessage } from '../../constants/error-messages';
 import { JsonValue } from '@prisma/client/runtime/library';
 
@@ -26,24 +26,30 @@ export class AuthHelper {
     firstName,
     lastName,
     email,
+    isTwoFactorAuthenticationEnabled,
+    isTwoFactorAuthenticated = false,
   }: {
     id: number;
     firstName: string;
     lastName: string;
     email: string;
+    isTwoFactorAuthenticationEnabled: boolean;
+    isTwoFactorAuthenticated?: boolean;
   }) {
     return await this.jwtService.signAsync({
       id,
       firstName,
       lastName,
       email,
+      isTwoFactorAuthenticated,
+      isTwoFactorAuthenticationEnabled,
     });
   }
 
   async sendConfirmationEmail(user: CreateUserDto) {
     const { confirmationToken, email } = user;
 
-    // await this.emailService.sendConfirmationEmail(email, user);
+    await this.emailService.sendConfirmationEmail(email, user);
 
     return confirmationToken;
   }

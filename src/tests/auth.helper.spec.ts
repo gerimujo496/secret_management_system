@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserModule } from '../user/user.module';
+import { UserModule } from '../modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { CreateUserDto } from '../user/dto/create-user.dto';
+import { CreateUserDto } from '../modules/auth/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
-import { errorMessage } from '../../constants/error-messages';
-import { AuthHelper } from './auth.helper';
-import { EmailService } from '../email/email.service';
+import { errorMessage } from '../constants/error-messages';
+import { AuthHelper } from '../modules/auth/auth.helper';
+import { EmailService } from '../modules/email/email.service';
 
 describe('AuthService', () => {
   let jwtService: JwtService;
@@ -58,8 +58,11 @@ describe('AuthService', () => {
 
   it('generateToken: it should generate the token', async () => {
     const result = await authHelper.generateToken({
-      ...user,
       id: createdUser.id,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
 
     expect(result).toBeDefined();
@@ -85,8 +88,11 @@ describe('AuthService', () => {
 
   it('getTokenPayloadOrThrowError:  should return the payload', async () => {
     const token = await authHelper.generateToken({
-      ...user,
       id: createdUser.id,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
     const payload = await authHelper.getTokenPayloadOrThrowError(token);
 

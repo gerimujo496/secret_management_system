@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDal } from './user.dal';
+import { errorMessage } from '../../constants/error-messages';
+import { Entities } from '../../constants/entities';
 
 @Injectable()
 export class UserService {
@@ -22,23 +24,29 @@ export class UserService {
     } catch (error) {}
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async findOne(id: number) {
+    const user = await this.userDal.findOneById(id);
+    if (!user)
+      throw new NotFoundException(errorMessage.NOT_FOUND(Entities.USER));
+
+    return user;
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const result = await this.userDal.update(id, updateUserDto);
+
+    if (!result)
+      throw new NotFoundException(errorMessage.NOT_FOUND(Entities.USER));
+
+    return result;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  async remove(id: number) {
+    const result = await this.userDal.delete(id);
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+    if (!result)
+      throw new NotFoundException(errorMessage.NOT_FOUND(Entities.USER));
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    return result;
   }
 }
