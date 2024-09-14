@@ -11,21 +11,21 @@ import {
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 
-import { UserService } from './user.service';
+import { UserService } from '../user/user.service';
 import { EmailService } from '../email/email.service';
 import { AuthHelper } from './auth.helper';
-import { UserDal } from './user.dal';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserDal } from '../user/user.dal';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { errorMessage } from '../../constants/error-messages';
-import { ConfirmEmailDto } from './dto/confirm-email.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ConfirmEmailDto } from '../user/dto/confirm-email.dto';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { Entities } from '../../constants/entities';
 import { UserProperties } from '../../constants/properties';
 import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { LogInUserDto } from './dto/login-user.dto';
-import { Login2FaDto } from './dto/login-fa.dto';
+import { ResetPasswordDto } from '../user/dto/reset-password.dto';
+import { LogInUserDto } from '../user/dto/login-user.dto';
+import { Login2FaDto } from '../user/dto/login-fa.dto';
 import { JsonValue } from '@prisma/client/runtime/library';
 
 const scrypt = promisify(_scrypt);

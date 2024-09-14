@@ -13,13 +13,13 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
-import { CreateUserDto } from './dto/create-user.dto';
-import { TwoFaCodeDto } from './dto/two-fa-code.dto';
-import { LogInUserDto } from './dto/login-user.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { TwoFaCodeDto } from '../user/dto/two-fa-code.dto';
+import { LogInUserDto } from '../user/dto/login-user.dto';
+import { ResetPasswordDto } from '../user/dto/reset-password.dto';
 import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 import { User } from '../../common/customDecorators/user.decorator';
-import { Login2FaDto } from './dto/login-fa.dto';
+import { Login2FaDto } from '../user/dto/login-fa.dto';
 
 @Controller(controller.AUTH)
 @ApiTags(controller.AUTH)

@@ -6,8 +6,8 @@ import * as SpeakEasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 
 import { EmailService } from '../email/email.service';
-import { UserDal } from './user.dal';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserDal } from '../user/user.dal';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { errorMessage } from '../../constants/error-messages';
 import { JsonValue } from '@prisma/client/runtime/library';
 

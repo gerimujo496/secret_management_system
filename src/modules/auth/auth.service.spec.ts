@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { UserModule } from './user.module';
+import { UserModule } from '../user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserDal } from './user.dal';
+import { UserDal } from '../user/user.dal';
 import {
   ConflictException,
   ForbiddenException,
@@ -19,8 +19,8 @@ import { Entities } from '../../constants/entities';
 import { EmailService } from '../email/email.service';
 import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { LogInUserDto } from './dto/login-user.dto';
+import { ResetPasswordDto } from '../user/dto/reset-password.dto';
+import { LogInUserDto } from '../user/dto/login-user.dto';
 
 describe('AuthService', () => {
   let service: AuthService;

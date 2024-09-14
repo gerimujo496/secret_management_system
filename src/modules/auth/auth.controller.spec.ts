@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { UserModule } from './user.module';
+import { UserModule } from '../user/user.module';
 import { ConfigModule } from '@nestjs/config';
 
 describe('AuthController', () => {

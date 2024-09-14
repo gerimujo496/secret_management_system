@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserModule } from './user.module';
+import { UserModule } from '../user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 import { errorMessage } from '../../constants/error-messages';
