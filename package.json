@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "postinstall": "prisma generate",
+    "build": "prisma generate && nest build",
     "migrate:dev": "cross-env NODE_ENV=dev npx prisma migrate dev",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
