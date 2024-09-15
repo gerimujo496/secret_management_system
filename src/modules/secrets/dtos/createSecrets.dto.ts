@@ -1,23 +1,18 @@
-import { ApiProperty } from "@nestjs/swagger";
-import {
-
-  IsNotEmpty,
-  IsString,
-
-} from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateSecretsDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    example: "Database Password",
+    example: 'Database Password',
     required: true,
   })
   name: string;
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    example: "Password for the Postgres database",
+    example: 'Password for the Postgres database',
     required: true,
   })
   description: string;
@@ -29,5 +24,3 @@ export class CreateSecretsDto {
   })
   value: string;
 }
-
-

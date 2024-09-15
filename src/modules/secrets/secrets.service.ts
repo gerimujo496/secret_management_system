@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { SecretsDAL } from './secrets.dal';
 import { AccountDAL } from '../account/account.dal';
-import { CreateSecretsDto } from './dtos/create-secrets.dto';
-import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
+import { CreateSecretsDto } from './dtos/createSecrets.dto';
+import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
 import { encrypt, decrypt } from '../../common/utils/encrypt';
 
 @Injectable()
@@ -35,10 +35,6 @@ export class SecretsService {
 
   async findAllSecretsByAccount(accountId: number) {
     const secrets = await this.secretsDAL.findAllSecrets(accountId);
-
-    if (secrets.length === 0) {
-      throw new NotFoundException('No secrets found for this account.');
-    }
 
     const account = await this.accountsDAL.findAccountById(accountId);
     if (!account) {

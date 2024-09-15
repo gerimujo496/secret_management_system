@@ -10,9 +10,9 @@ import {
   Put,
 } from '@nestjs/common';
 import { SecretsService } from './secrets.service';
-import { CreateSecretsDto } from './dtos/create-secrets.dto';
+import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
+import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
 
 @ApiTags('secrets')
 @Controller('secrets')
@@ -24,7 +24,7 @@ export class SecretsController {
     @Param('accountId', ParseIntPipe) accountId: number,
     @Body() createSecretDto: CreateSecretsDto,
   ) {
-    return this.secretsService.createSecret(createSecretDto,accountId);
+    return this.secretsService.createSecret(createSecretDto, accountId);
   }
 
   @Get(':accountId/secrets')
@@ -34,7 +34,7 @@ export class SecretsController {
     return this.secretsService.findAllSecretsByAccount(accountId);
   }
 
-  @Get(':accountId/secrets/:secretId')
+  @Get(':accountId/:secretId')
   async getSecretById(
     @Param('accountId', ParseIntPipe) accountId: number,
     @Param('secretId', ParseIntPipe) secretId: number,
@@ -42,7 +42,7 @@ export class SecretsController {
     return this.secretsService.findSecretByIdAndAccount(accountId, secretId);
   }
 
-  @Patch(':accountId/secrets/:secretId')
+  @Patch(':accountId/:secretId')
   async updateSecret(
     @Param('accountId', ParseIntPipe) accountId: number,
     @Param('secretId', ParseIntPipe) secretId: number,
@@ -54,7 +54,7 @@ export class SecretsController {
       updateSecretDto,
     );
   }
-  @Delete(':accountId/secrets/:secretId')
+  @Delete(':accountId/:secretId')
   async deleteSecret(
     @Param('accountId', ParseIntPipe) accountId: number,
     @Param('secretId', ParseIntPipe) secretId: number,

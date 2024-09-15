@@ -2,14 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SecretsService } from './secrets.service';
 import { SecretsDAL } from './secrets.dal';
 import { AccountDAL } from '../account/account.dal';
-import { CreateSecretsDto } from './dtos/create-Secrets.dto';
+import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import * as encryptUtils from '../../common/utils/encrypt';
 import {
   BadRequestException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
+import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
 
 jest.mock('../../common/utils/encrypt', () => ({
   encrypt: jest.fn(),
