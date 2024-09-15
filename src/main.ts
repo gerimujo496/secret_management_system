@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { default as hbs } from 'hbs';
 
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
@@ -9,7 +10,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
+  app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -30,6 +31,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
+  if (process.env.NODE_ENV != 'dev')
+    hbs.registerPartials(join(__dirname, '..', 'views'));
+
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
 

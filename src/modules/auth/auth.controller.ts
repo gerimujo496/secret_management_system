@@ -8,6 +8,7 @@ import {
   Request,
   UseGuards,
   Req,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
@@ -56,7 +57,11 @@ export class AuthController {
   @Get(controller_path.AUTH.RESET_PASSWORD_FORM)
   @Render('reset-password.hbs')
   async resetForm(@Query('token') token: string) {
-    return await this.authService.resetPasswordForm(token);
+    try {
+      return await this.authService.resetPasswordForm(token);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   @Post(controller_path.AUTH.RESET_PASSWORD)

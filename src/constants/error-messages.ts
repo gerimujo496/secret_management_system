@@ -26,4 +26,6 @@ export const errorMessage = {
     'Two factor authentication is not enabled, please login through the login endpoint ',
 
   WRONG_AUTH_CODE: 'Wrong authentication code',
+
+  CAN_NOT_SEND_EMAIL: 'Can not send email'
 };

@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "postbuild": "cp -r src/views dist/views",
     "postinstall": "prisma generate",
     "build": "prisma generate && nest build",
     "migrate:dev": "cross-env NODE_ENV=dev npx prisma migrate dev",
@@ -28,8 +29,9 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
-    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-express": "^10.4.1",
     "@nestjs/platform-fastify": "^10.4.1",
+    "@nestjs/serve-static": "^4.0.2",
     "@nestjs/swagger": "^7.4.0",
     "@prisma/client": "^5.19.1",
     "@sendgrid/helpers": "^8.0.0",

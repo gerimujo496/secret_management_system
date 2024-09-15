@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
@@ -49,8 +53,11 @@ export class AuthHelper {
   async sendConfirmationEmail(user: CreateUserDto) {
     const { confirmationToken, email } = user;
 
-    await this.emailService.sendConfirmationEmail(email, user);
-
+    try {
+      await this.emailService.sendConfirmationEmail(email, user);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
     return confirmationToken;
   }
 
