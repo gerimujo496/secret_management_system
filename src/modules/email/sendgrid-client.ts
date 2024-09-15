@@ -20,7 +20,9 @@ export class SendgridClient {
 
   async send(mail: MailDataRequired): Promise<void> {
     try {
-      await SendGrid.send(mail);
+      process.env.NODE_ENV == 'dev'
+        ? await SendGrid.send(mail)
+        : await SendGridProduction.send(mail);
       this.logger.log(`Email successfully dispatched to ${mail.to as string}`);
     } catch (error) {
       this.logger.error('Error while sending email', error);
