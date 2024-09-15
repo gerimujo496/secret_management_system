@@ -9,6 +9,7 @@ import { EmailModule } from './modules/email/email.module';
 import { SecretsService } from './modules/secrets/secrets.service';
 import { SecretsController } from './modules/secrets/secrets.controller';
 import { SecretsModule } from './modules/secrets/secrets.module';
+import { SecretSharingModule } from './modules/secret-sharing/secret-sharing.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SecretsModule } from './modules/secrets/secrets.module';
     }),
     PrismaModule,
     SecretsModule,
+    SecretSharingModule,
     UserModule,
     EmailModule,
   ],

@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MailDataRequired } from '@sendgrid/mail';
 import { SendgridClient } from './sendgrid-client';
 import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
 import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
 import { ConfigService } from '@nestjs/config';
+import { CreateSecretsDto } from '../secrets/dtos/create-Secrets.dto';
+
 
 @Injectable()
 export class EmailService {
@@ -28,6 +30,44 @@ export class EmailService {
     };
     await this.sendGridClient.send(mail);
   }
+  async secretSharingEmail(
+    recipient: string,
+    secret: CreateSecretsDto,
+    secretShareId: number
+  ):Promise<void>{
+    const mail: MailDataRequired = {
+      to: recipient,
+      from: this.configService.get<string>('MAIL_CONFIG_SENDER'),
+      templateId: 'd-64f1c5d75abb43159d37b1a747124dbe',
+      dynamicTemplateData:{
+        secretName: `${secret.name}`,
+        description:`${secret.description}`,
+        url: `${process.env.HOST}/secret-sharing/accept-secret/${secretShareId}`
+      }
+    }
+    console.log(secretShareId)
+    await this.sendGridClient.send(mail)
+  }
+
+  async sendVerificationCodeEmail(
+    recipient: string,
+    code: number
+  ): Promise<void> {
+    const mail: MailDataRequired = {
+      to: recipient,
+      from: this.configService.get<string>('MAIL_CONFIG_SENDER'),
+      subject: 'Your Verification Code',
+      text: `Your verification code is ${code}. Please use this code to complete your process.`,
+      html: `<p>Your verification code is <strong>${code}</strong>. Please use this code to complete your process.</p>`,
+    };
+    try {
+      await this.sendGridClient.send(mail);
+      console.log('Email successfully dispatched to:', recipient);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw new InternalServerErrorException('Could not send verification code email.');
+    }
+  }
 
   async sendResetPasswordEmail(
     recipient: string,
@@ -44,4 +84,5 @@ export class EmailService {
     };
     await this.sendGridClient.send(mail);
   }
+  
 }

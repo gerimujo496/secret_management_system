@@ -16,13 +16,13 @@ export class CreateSecretSharingDto {
     required: true,
   })
   expirationTime: Date;
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({
     example: '2',
     required: true,
   })
-  accountReceiverId: number;
+  receiverEmail: string;
   @IsNumber()
   @IsNotEmpty()
   @Max(2)

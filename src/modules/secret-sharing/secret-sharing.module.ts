@@ -4,6 +4,11 @@ import { SecretSharingController } from './secret-sharing.controller';
 import { AccountDAL } from '../account/account.dal';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SecretSharingDAL } from './secret-sharing.dal';
+import { SecretsDAL } from '../secrets/secrets.dal';
+import { EmailService } from '../email/email.service';
+import { SendgridClient } from '../email/sendgrid-client';
+import { UserDal } from '../user/user.dal';
+import { MembershipDAL } from '../membership/membership.dal';
 
 @Module({
   providers: [
@@ -11,6 +16,11 @@ import { SecretSharingDAL } from './secret-sharing.dal';
     AccountDAL,
     PrismaService,
     SecretSharingDAL,
+    SecretsDAL,
+   EmailService,
+   SendgridClient,
+   UserDal,
+   MembershipDAL
   ],
   controllers: [SecretSharingController],
   exports: [AccountDAL, SecretSharingDAL],
