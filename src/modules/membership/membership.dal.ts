@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 
 @Injectable()
@@ -11,10 +11,10 @@ export class MembershipDAL{
         return await this.prisma.membership.findFirst({
           where: {
             userId: userId,
-            deletedAt: null, // In case you want to filter out soft-deleted records
+            deletedAt: null, 
           },
           include: {
-            account: true, // To get the associated account details
+            account: true, 
           },
         });
       }

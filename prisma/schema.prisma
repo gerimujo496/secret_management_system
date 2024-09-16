@@ -10,16 +10,16 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:1111@localhost:5434/secrets_management_system_dev"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id                Int      @id @default(autoincrement())
   firstName         String   @map("first_name")
   lastName          String   @map("last_name")
-  email             String
+  email             String   @unique
   password          String
-  confirmationToken String?  @map("confirmation_token") 
+  confirmationToken String?  @map("confirmation_token")
   isConfirmed       Boolean? @map("is_confirmed")
   is2FaEnabled      Boolean  @default(false) @map("is_2fa_enabled")
 
@@ -32,11 +32,11 @@ model User {
   @@map("Users")
 }
 model Membership {
-  id          Int     @id @default(autoincrement())
-  userId      Int     @map("user_id")
-  accountId   Int     @map("account_id")
-  roleId      Int     @map("role_id")
-  isConfirmed Boolean @map("is_confirmed")
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  accountId   Int      @map("account_id")
+  roleId      Int      @map("role_id")
+  isConfirmed Boolean? @map("is_confirmed")
 
   user    User    @relation(fields: [userId], references: [id])
   role    Role    @relation(fields: [roleId], references: [id])
@@ -60,17 +60,18 @@ model Role {
   @@map("Roles")
 }
 model Account {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
-  description String
+  description String?
   password    String
 
   Membership    Membership[]
   AccountSecret AccountSecret[]
 
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @default(now()) @updatedAt @map("updated_at")
-  deletedAt      DateTime?     @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   accountGiver   SecretShare[] @relation("accountGiver")
   accountReciver SecretShare[] @relation("accountReciver")
 

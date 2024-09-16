@@ -5,11 +5,12 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { PrismaModule } from '../../prisma/prisma.module';
+
 import { UserDal } from './user.dal';
 import { EmailModule } from '../email/email.module';
 import { AuthHelper } from './auth.helper';
 import { ConfigService } from '@nestjs/config';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   controllers: [UserController, AuthController],

@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { SecretsService } from './secrets.service';
 import { SecretsController } from './secrets.controller';
 import { SecretsDAL } from './secrets.dal'; 
-import { PrismaService } from 'src/prisma/prisma.service'; 
+import { PrismaService } from '../prisma/prisma.service'; 
 import { AccountDAL } from '../account/account.dal';
 
 
