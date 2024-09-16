@@ -10,6 +10,8 @@ import {
   ParseIntPipe,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 import { UserService } from './user.service';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,7 +21,7 @@ import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 import { User } from '../../common/customDecorators/user.decorator';
 import { UserDal } from './user.dal';
 import { SerializerInterceptor } from '../../common/interceptors/serialize.interceptors';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 
 @Controller(controller.USER)
 @ApiBearerAuth()

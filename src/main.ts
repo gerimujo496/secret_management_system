@@ -17,13 +17,14 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
   const options = new DocumentBuilder()
     .setTitle('Secret Management System')
     .setDescription('Your API description')
     .setVersion('1.0')
-    .addServer('http://localhost:3000/', 'Local environment')
+    .addServer(process.env.HOST, 'Local environment')
     .addServer('https://staging.yourapi.com/', 'Staging')
-    .addServer('https://production.yourapi.com/', 'Production')
+    .addServer(process.env.HOST, 'Production')
     .addTag('Your API Tag')
     .addBearerAuth()
     .build();
@@ -37,7 +38,20 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
 
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    customSiteTitle: 'Api Docs',
+    customfavIcon:
+      'https://static-00.iconduck.com/assets.00/swagger-icon-512x512-halz44im.png',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js',
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css',
+    ],
+  });
   await app.listen(process.env.PORT || 8000);
 }
 bootstrap();

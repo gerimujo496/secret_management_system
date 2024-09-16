@@ -27,5 +27,5 @@ export const errorMessage = {
 
   WRONG_AUTH_CODE: 'Wrong authentication code',
 
-  CAN_NOT_SEND_EMAIL: 'Can not send email'
+  CAN_NOT_SEND_EMAIL: 'Can not send email',
 };

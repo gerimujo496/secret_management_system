@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
   UnprocessableEntityException,
@@ -158,8 +159,11 @@ export class AuthService {
 
     const newUser = await this.updateConfirmationTokenAndReturnNewUser(user);
 
-    await this.emailService.sendResetPasswordEmail(newUser.email, newUser);
-
+    try {
+      await this.emailService.sendResetPasswordEmail(newUser.email, newUser);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
     return 'Please check your email';
   }
 
@@ -213,6 +217,9 @@ export class AuthService {
 
     if (!user.isConfirmed)
       throw new ForbiddenException(errorMessage.EMAIL_IS_NOT_CONFIRMED);
+
+    if (user.isTwoFactorAuthenticationEnabled)
+      throw new ForbiddenException(errorMessage.USER_2FA_IS_ENABLED);
 
     const token = await this.authHelper.generateToken(user);
 
