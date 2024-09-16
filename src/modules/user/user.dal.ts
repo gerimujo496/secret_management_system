@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfirmEmailDto } from './dto/confirm-email.dto';
 import { errorMessage } from '../../constants/error-messages';
 import { Entities } from '../../constants/entities';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UserDal {

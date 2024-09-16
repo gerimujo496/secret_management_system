@@ -17,5 +17,21 @@ export const errorMessage = {
 
   EMAIL_IS_CONFIRMED: 'Email is confirmed',
 
-  EMAIL_IS_NOT_CONFIRMED: 'Email is not confirmed'
+  EMAIL_IS_NOT_CONFIRMED: 'Email is not confirmed',
+
+  ID_REQUIRED: (id: string) => `${id} is required.`,
+
+  BOTH_REQUIRED: (id1: string, id2: string) =>
+    `${id1} and ${id2} are both required.`,
+
+  INVALID_ENTITY: (entity: string) =>
+    `Invalid ${entity} or ${entity} not found.`,
+
+  FORBIDDEN_ACCESS: 'Forbidden access.',
+
+  INVALID_ROLE: 'Please assign a valid new role.',
+
+  EMPTY_DATA: 'No data provided',
+
+  REQUIRED_ROLE: 'You do not have the required roles',
 };
