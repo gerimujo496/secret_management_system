@@ -87,24 +87,24 @@ export class SecretSharingService {
       createSecretSharingDto,
       accountGiverId,
     );
-    await this.emailService.secretSharingEmail(
-      receiverUser.email,
-      secret,
-      secretShare.id,
-    );
+    try{
+      await this.emailService.secretSharingEmail(
+        receiverUser.email,
+        secret,
+        secretShare.id,
+      );
+    }
+    catch{
+      throw new InternalServerErrorException("Could not send email ")
+    }
     await this.sendVerificationCode(secretShare.id);
     return secretShare;
   }
 
   async sendVerificationCode(secretShareId: number): Promise<any> {
-    console.log(
-      'sendVerificationCode method called with secretShareId:',
-      secretShareId,
-    );
     const verificationCode = generateSixDigitCode();
 
-    const secretShare =
-      await this.secretsSharingDAL.findSecretShareById(secretShareId);
+    const secretShare = await this.secretsSharingDAL.findSecretShareById(secretShareId);
     if (!secretShare) {
       throw new NotFoundException('Secret sharing record not found.');
     }
@@ -118,10 +118,6 @@ export class SecretSharingService {
       accountReceiver.id,
     );
     if (!receiverMembership) {
-      console.log(
-        'No membership found for the receiver account with ID:',
-        accountReceiver.id,
-      );
       throw new NotFoundException(
         'No membership found for the receiver account.',
       );
@@ -132,7 +128,6 @@ export class SecretSharingService {
     if (!receiverUser) {
       throw new NotFoundException('Receiver user not found.');
     }
-    try {
       const updateResult = await this.secretsSharingDAL.updateSecretSharing(
         secretShareId,
         {
@@ -142,19 +137,12 @@ export class SecretSharingService {
       if (!updateResult) {
         throw new Error('Failed to update secret sharing passcode');
       }
-    } catch (error) {
-      console.error('Error updating secret sharing passcode:', error);
-      throw new InternalServerErrorException(
-        'Could not save verification code.',
-      );
-    }
     try {
       await this.emailService.sendVerificationCodeEmail(
         receiverUser.email,
         verificationCode,
       );
-    } catch (error) {
-      console.error('Error sending verification code email:', error);
+    } catch {
       throw new InternalServerErrorException(
         'Could not send verification code email.',
       );
@@ -190,12 +178,11 @@ export class SecretSharingService {
       throw new BadRequestException('Hex key is missing.');
     }
     let isKeyValid = false;
-    try {
       const providedKeyBuffer = Buffer.from(acceptSecretDto.hexKey, 'hex');
       if (providedKeyBuffer.toString('hex') === giverGeneratedKey) {
         isKeyValid = true;
       }
-    } catch (error) {}
+  
     if (!isKeyValid || acceptSecretDto.code !== secretShare.passcode) {
       await this.secretsSharingDAL.decrementTries(secretShareId);
       throw new BadRequestException('Key or code are invalid.');
