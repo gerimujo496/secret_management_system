@@ -3,12 +3,15 @@ import { Module } from '@nestjs/common';
 import { SecretsService } from './secrets.service';
 import { SecretsController } from './secrets.controller';
 import { SecretsDAL } from './secrets.dal'; 
-import { PrismaService } from 'src/prisma/prisma.service'; 
-import { AccountDAL } from '../account/account.dal';
+
+import { AccountDAL } from '../account/dal/account.dal';
+import { ErrorDal } from 'src/common/dal/error.dal';
+import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
-  imports: [],
-  providers: [SecretsService, SecretsDAL,AccountDAL, PrismaService],
+  imports: [PrismaModule],
+  providers: [SecretsService, SecretsDAL,AccountDAL, PrismaService,ErrorDal],
   controllers: [SecretsController],
   exports:[SecretsDAL,AccountDAL]
 })

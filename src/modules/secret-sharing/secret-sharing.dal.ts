@@ -1,4 +1,4 @@
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { CreateSecretSharingDto } from "./dtos/create-secretSharing.dto";
 import { Injectable, NotFoundException } from "@nestjs/common";
 

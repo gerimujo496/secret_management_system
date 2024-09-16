@@ -8,34 +8,44 @@ generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 model User {
-  id           Int          @id @default(autoincrement())
-  firstName    String       @map("first_name")
-  lastName     String       @map("last_name")
-  email        String
-  password     String
-  isConfirmed  Boolean?     @map("is_confirmed")
-  is2FaEnabled Boolean      @default(false) @map("is_2fa_enabled")
-  Membership   Membership[]
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
-  deletedAt    DateTime?    @map("deleted_at")
+  id                Int      @id @default(autoincrement())
+  firstName         String   @map("first_name")
+  lastName          String   @map("last_name")
+  email             String   @unique
+  password          String
+  confirmationToken String?  @map("confirmation_token")
+  isConfirmed       Boolean? @map("is_confirmed")
+  is2FaEnabled      Boolean  @default(false) @map("is_2fa_enabled")
+
+  Membership Membership[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("Users")
 }
 
 model Membership {
-  id          Int       @id @default(autoincrement())
-  userId      Int       @map("user_id")
-  accountId   Int       @map("account_id")
-  roleId      Int       @map("role_id")
-  isConfirmed Boolean   @map("is_confirmed")
-  user        User      @relation(fields: [userId], references: [id])
-  role        Role      @relation(fields: [roleId], references: [id])
-  account     Account   @relation(fields: [accountId], references: [id])
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  accountId   Int      @map("account_id")
+  roleId      Int      @map("role_id")
+  isConfirmed Boolean? @map("is_confirmed")
+
+  user    User    @relation(fields: [userId], references: [id])
+  role    Role    @relation(fields: [roleId], references: [id])
+  account Account @relation(fields: [accountId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("Memberships")
 }
@@ -44,25 +54,29 @@ model Role {
   id         Int          @id @default(autoincrement())
   roleName   UserRoles    @map("role_name")
   Membership Membership[]
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at")
-  deletedAt  DateTime?    @map("deleted_at")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("Roles")
 }
 
 model Account {
-  id             Int             @id @default(autoincrement())
-  name           String
-  description    String
-  password       String
-  Membership     Membership[]
-  AccountSecret  AccountSecret[]
-  createdAt      DateTime        @default(now()) @map("created_at")
-  updatedAt      DateTime        @default(now()) @updatedAt @map("updated_at")
-  deletedAt      DateTime?       @map("deleted_at")
-  accountGiver   SecretShare[]   @relation("accountGiver")
-  accountReciver SecretShare[]   @relation("accountReciver")
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  password    String
+
+  Membership    Membership[]
+  AccountSecret AccountSecret[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  accountGiver   SecretShare[] @relation("accountGiver")
+  accountReciver SecretShare[] @relation("accountReciver")
 
   @@map("Accounts")
 }
