@@ -41,7 +41,7 @@ export class EmailService {
       dynamicTemplateData: {
         secretName: `${secret.name}`,
         description: `${secret.description}`,
-        url: `${process.env.HOST}/secret-sharing/accept-secret/${secretShareId}`,
+        url: `${process.env.HOST}/${controller_path.SECRETSHARE.POST_NEW_SHARE_SECRET}`,
       },
     };
     await this.sendGridClient.send(mail);

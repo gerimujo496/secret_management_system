@@ -9,6 +9,7 @@ import { EmailService } from '../email/email.service';
 import { SendgridClient } from '../email/sendgrid-client';
 import { UserDal } from '../user/user.dal';
 import { MembershipDAL } from '../membership/membership.dal';
+import { ErrorDal } from 'src/common/dal/error.dal';
 
 @Module({
   providers: [
@@ -20,7 +21,8 @@ import { MembershipDAL } from '../membership/membership.dal';
    EmailService,
    SendgridClient,
    UserDal,
-   MembershipDAL
+   MembershipDAL,
+   ErrorDal
   ],
   controllers: [SecretSharingController],
   exports: [AccountDAL, SecretSharingDAL],

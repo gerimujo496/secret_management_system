@@ -34,4 +34,7 @@ export const errorMessage = {
   EMPTY_DATA: 'No data provided',
 
   REQUIRED_ROLE: 'You do not have the required roles',
+
+  INVALID_TIME: 'Invalid time',
+  INVALID_ATTEMPT: 'You have used all your attempts'
 };

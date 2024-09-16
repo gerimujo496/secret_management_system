@@ -1,43 +1,46 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateSecretSharingDto } from './dtos/create-secretSharing.dto';
+import { CreateSecretSharingDto } from './dtos/create-secret-sharing.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SecretShare } from '@prisma/client';
-
+import { ErrorDal } from 'src/common/dal/error.dal';
 @Injectable()
 export class SecretSharingDAL {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private errorDAL: ErrorDal,
+  ) {}
 
-  async createSecret(
+  async createSecretShare(
     createSecretSharingDto: CreateSecretSharingDto,
     accountGiverId: number,
   ) {
-    const receiverAccount = await this.prisma.user.findFirst({
-      where: {
-        email: createSecretSharingDto.receiverEmail,
-      },
-    });
+    try {
+      const receiverAccount = await this.prisma.user.findFirst({
+        where: {
+          email: createSecretSharingDto.receiverEmail,
+        },
+      });
 
-    if (!receiverAccount) {
-      throw new Error('Receiver account not found.');
+      return await this.prisma.secretShare.create({
+        data: {
+          expirationTime: createSecretSharingDto.expirationTime,
+          numberOfTries: createSecretSharingDto.numberOfTries,
+          passcode: null,
+          isAccepted: false,
+          secret: {
+            connect: { id: createSecretSharingDto.secretId },
+          },
+          accountReceiver: {
+            connect: { id: receiverAccount.id },
+          },
+          accountGiver: {
+            connect: { id: accountGiverId },
+          },
+        },
+      });
+    } catch (error) {
+      this.errorDAL.handleError(error);
     }
-
-    return await this.prisma.secretShare.create({
-      data: {
-        expirationTime: createSecretSharingDto.expirationTime,
-        numberOfTries: createSecretSharingDto.numberOfTries,
-        passcode: null,
-        isAccepted: false,
-        secret: {
-          connect: { id: createSecretSharingDto.secretId },
-        },
-        accountReceiver: {
-          connect: { id: receiverAccount.id },
-        },
-        accountGiver: {
-          connect: { id: accountGiverId },
-        },
-      },
-    });
   }
 
   async findSecretShareById(secretShareId: number) {
@@ -47,26 +50,38 @@ export class SecretSharingDAL {
   }
 
   async decrementTries(secretShareId: number) {
-    return this.prisma.secretShare.update({
-      where: { id: secretShareId },
-      data: { numberOfTries: { decrement: 1 } },
-    });
+    try {
+      return this.prisma.secretShare.update({
+        where: { id: secretShareId },
+        data: { numberOfTries: { decrement: 1 } },
+      });
+    } catch (error) {
+      this.errorDAL.handleError(error);
+    }
   }
 
   async markAsAccepted(secretShareId: number) {
-    return this.prisma.secretShare.update({
-      where: { id: secretShareId },
-      data: { isAccepted: true },
-    });
+    try {
+      return this.prisma.secretShare.update({
+        where: { id: secretShareId },
+        data: { isAccepted: true },
+      });
+    } catch (error) {
+      this.errorDAL.handleError(error);
+    }
   }
 
   async addSecretToAccount(accountId: number, secretId: number) {
-    return this.prisma.accountSecret.create({
-      data: {
-        accountId,
-        secretId,
-      },
-    });
+    try {
+      return this.prisma.accountSecret.create({
+        data: {
+          accountId,
+          secretId,
+        },
+      });
+    } catch (error) {
+      this.errorDAL.handleError(error);
+    }
   }
   async updateSecretSharing(
     secretShareId: number,
@@ -79,7 +94,7 @@ export class SecretSharingDAL {
       });
       return updatedSecretShare;
     } catch (error) {
-      throw new Error(`Error updating secret share record: ${error.message}`);
+      this.errorDAL.handleError(error);
     }
   }
 }

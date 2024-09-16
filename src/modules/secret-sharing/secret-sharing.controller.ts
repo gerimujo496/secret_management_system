@@ -8,26 +8,36 @@ import {
   Post,
   Render,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { SecretSharingService } from './secret-sharing.service';
-import { CreateSecretSharingDto } from './dtos/create-secretSharing.dto';
+import { CreateSecretSharingDto } from './dtos/create-secret-sharing.dto';
 import { AcceptSecretDto } from './dtos/accept-secret.dto';
 import { SecretSharingDAL } from './secret-sharing.dal';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRoles } from '@prisma/client';
+import { controller_path } from 'src/constants/controller-path';
 
 @ApiTags('secret-sharing')
 @Controller('secret-sharing')
+// @UseGuards(AuthGuard)
+// @UseGuards(RolesGuard)
 export class SecretSharingController {
   constructor(
     private readonly secretsSharingService: SecretSharingService,
     private readonly secretShareDAL: SecretSharingDAL,
   ) {}
 
-  @Get('/:accountId')
+  @Get(controller_path.SECRETSHARE.GET_KEY)
+  @Roles(UserRoles.ADMIN)
   async generateKey(@Param('accountId', ParseIntPipe) accountId: number) {
     return this.secretsSharingService.genereateKey(accountId);
   }
-  @Post('/:accountGiverId')
+  @Post(controller_path.SECRETSHARE.CREATE_SHARE_SECRET)
+  @Roles(UserRoles.ADMIN)
   async shareSecret(
     @Param('accountGiverId', ParseIntPipe) accountGiverId: number,
     @Body() createSecretSharingDto: CreateSecretSharingDto,
@@ -38,21 +48,23 @@ export class SecretSharingController {
     );
   }
 
-  @Get('/accept-secret/:secretShareId')
+  @Get(controller_path.SECRETSHARE.GET_SHARE_SECRET_FORM)
+  @Roles(UserRoles.ADMIN)
   @Render('share-secretKey.hbs')
   async getSecretSharePage(
     @Param('secretShareId', ParseIntPipe) secretShareId: number,
   ) {
-    const secretShare = await this.secretShareDAL.findSecretShareById(secretShareId);
-    console.log(secretShare);
+    const secretShare =
+      await this.secretShareDAL.findSecretShareById(secretShareId);
+
     if (!secretShare) {
-      console.log(secretShare);
       throw new NotFoundException('Secret share not found');
     }
     return { secretShareId: secretShare.id };
   }
 
-  @Post('/accept/:secretShareId')
+  @Post(controller_path.SECRETSHARE.POST_NEW_SHARE_SECRET)
+  @Roles(UserRoles.ADMIN)
   @Render('secretShareConfirmation.hbs')
   async acceptSecret(
     @Param('secretShareId', ParseIntPipe) secretShareId: number,

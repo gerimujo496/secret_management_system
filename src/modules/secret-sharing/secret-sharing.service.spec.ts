@@ -119,7 +119,7 @@ describe('SecretSharingService', () => {
         updatedAt: new Date(),
         deletedAt: null  });
       jest.spyOn(secretsDAL, 'findSecretById').mockResolvedValue(secret);
-      jest.spyOn(secretSharingDAL, 'createSecret').mockResolvedValue({ id: 1,
+      jest.spyOn(secretSharingDAL, 'createSecretShare').mockResolvedValue({ id: 1,
         expirationTime: new Date(),
         accountGiverId: 1,
         accountReceiverId: 1,

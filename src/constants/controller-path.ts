@@ -21,5 +21,19 @@ export const controller_path = {
     UPDATE_ROLE: ':accountId/role/:userId',
     DELETE_MEMBERSHIP: ':membershipId/:accountId',
   },
-  
+  SECRET:{
+    PATH:'secret',
+    CREATE_SECRET:':accountId/secrets',
+    GET_ONE: ':accountId/:secretId',
+    GET_SECRETS: ':accountId/secrets',
+    UPDATE_SECRETS: ':accountId/:secretId',
+    DELETE_SECRET: ':accountId/:secretId'
+  },
+  SECRETSHARE:{
+PATH: 'secret-sharing',
+GET_KEY: '/:accountId',
+CREATE_SHARE_SECRET:'/:accountGiverId',
+GET_SHARE_SECRET_FORM:'/:secretShareId',
+ POST_NEW_SHARE_SECRET:'/:secretShareId'
+  }
 };
