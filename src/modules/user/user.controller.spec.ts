@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { UserDal } from './user.dal';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -8,7 +9,18 @@ describe('UserController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
-      providers: [UserService],
+      providers: [UserService, {
+        provide: UserDal,
+        useValue: {
+          create:jest.fn(),
+          findByEmail:jest.fn(),
+          getAllUsers:jest.fn(),
+          findOneById:jest.fn(),
+          update:jest.fn(),
+          resetPassword:jest.fn(),
+          delete:jest.fn()
+        }, 
+      },],
     }).compile();
 
     controller = module.get<UserController>(UserController);
