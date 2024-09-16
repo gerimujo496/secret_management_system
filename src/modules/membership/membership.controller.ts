@@ -12,6 +12,7 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { controller_path } from 'src/constants/controller-path';
 
 @Controller('membership')
 @UseGuards(AuthGuard)
@@ -19,7 +20,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 export class MembershipController {
   constructor(private membershipService: MembershipService) {}
 
-  @Patch('/:accountId/role/:userId')
+  @Patch(controller_path.MEMBERSHIP.UPDATE_ROLE)
   @Roles(UserRoles.ADMIN)
   updateUserRole(
     @Param('userId') userId: string,
@@ -33,7 +34,7 @@ export class MembershipController {
     });
   }
 
-  @Delete('/:membershipId/:accountId')
+  @Delete(controller_path.MEMBERSHIP.DELETE_MEMBERSHIP)
   @Roles(UserRoles.ADMIN)
   deleteMembership(
     @Param('membershipId') membershipId: string,

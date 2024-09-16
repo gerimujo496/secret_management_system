@@ -2,105 +2,59 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { MembershipDAL } from './dal/membership.dal';
 
 @Injectable()
 export class MembershipService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private membershipDAL: MembershipDAL) {}
 
   async updateUserRole({ accountId, userId, role }: UpdateMembership) {
-    try {
-      if (!userId || !accountId) return null;
+    if (!userId || !accountId)
+      throw new BadRequestException(
+        'User ID and Account ID are both required.',
+      );
 
-      const roleUpperCase = role.toUpperCase();
+    const roleUpperCase = role.toUpperCase();
 
-      if (
-        roleUpperCase !== UserRoles.EDITOR &&
-        roleUpperCase !== UserRoles.VIEWER
-      ) {
-        return new BadRequestException('Bad Request.');
-      }
-
-      const membership = await this.prisma.membership.findFirst({
-        where: {
-          accountId,
-          userId,
-          deletedAt: null,
-          isConfirmed: true,
-          role: { roleName: { not: UserRoles.ADMIN } },
-        },
-        select: {
-          id: true,
-          userId: true,
-          role: {
-            select: {
-              roleName: true,
-            },
-          },
-        },
-      });
-
-      if (!membership) {
-        throw new BadRequestException('Bad request.');
-      }
-
-      const roleRecord = await this.prisma.role.findFirst({
-        where: { roleName: roleUpperCase },
-        select: {
-          id: true,
-        },
-      });
-
-      const updateUserRole = this.prisma.membership.update({
-        where: { id: membership.id },
-        data: {
-          roleId: roleRecord.id,
-        },
-      });
-
-      return updateUserRole;
-    } catch (error) {
-      return new ExceptionsHandler(error.response);
+    if (
+      roleUpperCase !== UserRoles.EDITOR &&
+      roleUpperCase !== UserRoles.VIEWER
+    ) {
+      return new BadRequestException('Please assign a valid new role.');
     }
+
+    const membership = await this.membershipDAL.findNotAdminMembership(
+      accountId,
+      userId,
+    );
+
+    const roleRecord = await this.membershipDAL.findRoleRecord(roleUpperCase);
+
+    const updatedMembership = await this.membershipDAL.updateUserRole(
+      membership.id,
+      roleRecord.id,
+    );
+
+    return updatedMembership;
   }
 
   async deleteMembership(membershipId: number, accountId: number) {
-    try {
-      if (!membershipId || !accountId) return null;
+    if (!membershipId || !accountId)
+      throw new BadRequestException(
+        'Membership ID and Account ID are both required.',
+      );
 
-      const membership = await this.prisma.membership.findFirst({
-        where: {
-          id: membershipId,
-          isConfirmed: true,
-          deletedAt: null,
-        },
-        select: {
-          id: true,
-          role: {
-            select: {
-              roleName: true,
-            },
-          },
-        },
-      });
+    const membership = await this.membershipDAL.findMembership(
+      membershipId,
+      accountId,
+    );
 
-      if (!membership) {
-        throw new NotFoundException('Membership not found.');
-      }
-
-      if (membership.role.roleName === UserRoles.ADMIN) {
-        throw new ForbiddenException('Forbidden access.');
-      }
-
-      return await this.prisma.membership.delete({
-        where: { id: membership.id },
-      });
-    } catch (error) {
-      return new ExceptionsHandler(error.response);
+    if (membership.role.roleName === UserRoles.ADMIN) {
+      throw new ForbiddenException('Forbidden access.');
     }
+
+    return await this.membershipDAL.deleteMembership(membership.id);
   }
 }
