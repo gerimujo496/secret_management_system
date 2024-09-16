@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { CreateAccountDto } from '../dtos/create-account.dto';
 import { UserRoles } from '@prisma/client';
@@ -33,15 +33,9 @@ export class AccountDAL {
         },
       });
 
-      if (!membership) {
-        throw new NotFoundException(
-          'Invalid membership or membership not found.',
-        );
-      }
-
       return membership;
     } catch (error) {
-      this.errorDAL.handleError(error, NotFoundException);
+      this.errorDAL.handleError(error);
     }
   }
 
@@ -63,13 +57,9 @@ export class AccountDAL {
         where: { id: accountId, deletedAt: null },
       });
 
-      if (!account) {
-        throw new NotFoundException('Invalid account or account not found.');
-      }
-
       return account;
     } catch (error) {
-      this.errorDAL.handleError(error, NotFoundException);
+      this.errorDAL.handleError(error);
     }
   }
 
@@ -127,10 +117,6 @@ export class AccountDAL {
           where: { roleName: UserRoles.ADMIN },
         });
 
-        if (!roleRecord) {
-          throw new NotFoundException('Admin role not found.');
-        }
-
         const createdMembership = await prisma.membership.create({
           data: {
             userId,
@@ -143,7 +129,7 @@ export class AccountDAL {
         return [createdAccount, createdMembership];
       });
     } catch (error) {
-      this.errorDAL.handleError(error, NotFoundException);
+      this.errorDAL.handleError(error);
     }
   }
 

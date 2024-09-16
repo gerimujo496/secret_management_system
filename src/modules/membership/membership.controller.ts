@@ -14,7 +14,7 @@ import { UserRoles } from '@prisma/client';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { controller_path } from 'src/constants/controller-path';
 
-@Controller('membership')
+@Controller(controller_path.MEMBERSHIP.PATH)
 @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class MembershipController {

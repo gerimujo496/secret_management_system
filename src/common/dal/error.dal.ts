@@ -3,17 +3,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
   ConflictException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ErrorDal {
-  handleError(error: any, errorType?: new (...args: any[]) => Error) {
+  handleError(error: any) {
     if (error instanceof PrismaClientKnownRequestError) {
       this.handlePrismaError(error);
-    } else if (errorType && error instanceof errorType) {
-      throw error;
     } else {
       throw new InternalServerErrorException(
         'An error occurred while processing your request.',
@@ -23,12 +20,36 @@ export class ErrorDal {
 
   private handlePrismaError(error: PrismaClientKnownRequestError) {
     switch (error.code) {
+      case 'P1000':
+      case 'P1001':
+      case 'P1002':
+      case 'P1003':
+        throw new InternalServerErrorException(
+          'A database error occurred. Please check your database connection or schema.',
+        );
+
       case 'P1010':
-        throw new ForbiddenException('Denied access on database.');
+        throw new NotFoundException('The requested record was not found.');
+
       case 'P2002':
         throw new ConflictException('A unique constraint violation occurred.');
+
       case 'P2025':
-        throw new NotFoundException('Record not found');
+        throw new NotFoundException(
+          'The record you are trying to update or delete was not found.',
+        );
+
+      case 'P2026':
+      case 'P2003':
+        throw new ConflictException(
+          'A foreign key constraint violation occurred.',
+        );
+
+      case 'P2024':
+        throw new InternalServerErrorException(
+          'An invalid field error occurred. Please check the data being sent to the database.',
+        );
+
       default:
         throw new InternalServerErrorException('A database error occurred.');
     }

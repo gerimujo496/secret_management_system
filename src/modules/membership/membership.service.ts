@@ -2,9 +2,11 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
 import { MembershipDAL } from './dal/membership.dal';
+import { errorMessage } from 'src/constants/error-messages';
 
 @Injectable()
 export class MembershipService {
@@ -13,7 +15,7 @@ export class MembershipService {
   async updateUserRole({ accountId, userId, role }: UpdateMembership) {
     if (!userId || !accountId)
       throw new BadRequestException(
-        'User ID and Account ID are both required.',
+        errorMessage.BOTH_REQUIRED('User ID', 'Account ID'),
       );
 
     const roleUpperCase = role.toUpperCase();
@@ -22,18 +24,26 @@ export class MembershipService {
       roleUpperCase !== UserRoles.EDITOR &&
       roleUpperCase !== UserRoles.VIEWER
     ) {
-      return new BadRequestException('Please assign a valid new role.');
+      return new BadRequestException(errorMessage.INVALID_ROLE);
     }
 
-    const membership = await this.membershipDAL.findNotAdminMembership(
+    const notAdminMembership = await this.membershipDAL.findNotAdminMembership(
       accountId,
       userId,
     );
 
+    if (!notAdminMembership) {
+      throw new NotFoundException(errorMessage.INVALID_ENTITY('membership'));
+    }
+
     const roleRecord = await this.membershipDAL.findRoleRecord(roleUpperCase);
 
+    if (!roleRecord) {
+      throw new NotFoundException(errorMessage.INVALID_ENTITY('role'));
+    }
+
     const updatedMembership = await this.membershipDAL.updateUserRole(
-      membership.id,
+      notAdminMembership.id,
       roleRecord.id,
     );
 
@@ -43,7 +53,7 @@ export class MembershipService {
   async deleteMembership(membershipId: number, accountId: number) {
     if (!membershipId || !accountId)
       throw new BadRequestException(
-        'Membership ID and Account ID are both required.',
+        errorMessage.BOTH_REQUIRED('Membership ID', 'Account ID'),
       );
 
     const membership = await this.membershipDAL.findMembership(
@@ -51,8 +61,12 @@ export class MembershipService {
       accountId,
     );
 
+    if (!membership) {
+      throw new NotFoundException(errorMessage.INVALID_ENTITY('membership'));
+    }
+
     if (membership.role.roleName === UserRoles.ADMIN) {
-      throw new ForbiddenException('Forbidden access.');
+      throw new ForbiddenException(errorMessage.FORBIDDEN_ACCESS);
     }
 
     return await this.membershipDAL.deleteMembership(membership.id);

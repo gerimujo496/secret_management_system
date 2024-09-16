@@ -10,12 +10,14 @@ export const controller_path = {
     RESET_PASSWORD: 'reset_password',
   },
   ACCOUNT: {
+    PATH: 'account',
     GET_ONE: ':accountId',
     GET_USERS: ':accountId/users',
     UPDATE_ACCOUNT: ':accountId',
     DELETE_ACCOUNT: ':accountId',
   },
   MEMBERSHIP: {
+    PATH: 'membership',
     UPDATE_ROLE: ':accountId/role/:userId',
     DELETE_MEMBERSHIP: ':membershipId/:accountId',
   },

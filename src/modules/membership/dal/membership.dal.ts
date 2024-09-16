@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
 import { ErrorDal } from 'src/common/dal/error.dal';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -28,12 +28,6 @@ export class MembershipDAL {
       },
     });
 
-    if (!membership) {
-      throw new NotFoundException(
-        'Invalid membership or membership not found.',
-      );
-    }
-
     return membership;
   }
 
@@ -49,15 +43,9 @@ export class MembershipDAL {
         },
       });
 
-      if (!notAdminMembership) {
-        throw new NotFoundException(
-          'Invalid membership or membership not found.',
-        );
-      }
-
       return notAdminMembership;
     } catch (error) {
-      this.errorDAL.handleError(error, NotFoundException);
+      this.errorDAL.handleError(error);
     }
   }
 

@@ -18,7 +18,7 @@ import { UserRoles } from '@prisma/client';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { controller_path } from 'src/constants/controller-path';
 
-@Controller('account')
+@Controller(controller_path.ACCOUNT.PATH)
 @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class AccountController {
