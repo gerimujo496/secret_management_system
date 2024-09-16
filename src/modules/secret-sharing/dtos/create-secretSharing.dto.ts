@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {  IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Max } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+} from 'class-validator';
 
 export class CreateSecretSharingDto {
   @IsDateString()
@@ -37,5 +44,5 @@ export class CreateSecretSharingDto {
     example: '6',
     required: true,
   })
-  passcode: number| null;
+  passcode: number | null;
 }
