@@ -45,7 +45,6 @@ export class SecretsController {
   @Patch(':accountId/:secretId')
   async updateSecret(
     @Param('accountId', ParseIntPipe) accountId: number,
-
     @Param('secretId', ParseIntPipe) secretId: number,
     @Body() updateSecretDto: UpdateSecretsDto,
   ) {
