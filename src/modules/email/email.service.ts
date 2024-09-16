@@ -5,8 +5,7 @@ import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
 import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
 import { ConfigService } from '@nestjs/config';
-import { CreateSecretsDto } from '../secrets/dtos/create-Secrets.dto';
-
+import { CreateSecretsDto } from '../secrets/dtos/createSecrets.dto';
 
 @Injectable()
 export class EmailService {
@@ -33,25 +32,24 @@ export class EmailService {
   async secretSharingEmail(
     recipient: string,
     secret: CreateSecretsDto,
-    secretShareId: number
-  ):Promise<void>{
+    secretShareId: number,
+  ): Promise<void> {
     const mail: MailDataRequired = {
       to: recipient,
       from: this.configService.get<string>('MAIL_CONFIG_SENDER'),
       templateId: 'd-64f1c5d75abb43159d37b1a747124dbe',
-      dynamicTemplateData:{
+      dynamicTemplateData: {
         secretName: `${secret.name}`,
-        description:`${secret.description}`,
-        url: `${process.env.HOST}/secret-sharing/accept-secret/${secretShareId}`
-      }
-    }
-    console.log(secretShareId)
-    await this.sendGridClient.send(mail)
+        description: `${secret.description}`,
+        url: `${process.env.HOST}/secret-sharing/accept-secret/${secretShareId}`,
+      },
+    };
+    await this.sendGridClient.send(mail);
   }
 
   async sendVerificationCodeEmail(
     recipient: string,
-    code: number
+    code: number,
   ): Promise<void> {
     const mail: MailDataRequired = {
       to: recipient,
@@ -62,10 +60,10 @@ export class EmailService {
     };
     try {
       await this.sendGridClient.send(mail);
-      console.log('Email successfully dispatched to:', recipient);
     } catch (error) {
-      console.error('Error sending email:', error);
-      throw new InternalServerErrorException('Could not send verification code email.');
+      throw new InternalServerErrorException(
+        'Could not send verification code email.',
+      );
     }
   }
 
@@ -84,5 +82,4 @@ export class EmailService {
     };
     await this.sendGridClient.send(mail);
   }
-  
 }

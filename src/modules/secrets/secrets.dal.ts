@@ -1,17 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateSecretsDto } from './dtos/create-Secrets.dto';
-import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
+import { CreateSecretsDto } from './dtos/createSecrets.dto';
+import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
 
 @Injectable()
 export class SecretsDAL {
   constructor(private readonly prisma: PrismaService) {}
 
   async createSecret(createSecretDto: CreateSecretsDto, accountId: number) {
-
-   
     return await this.prisma.secret.create({
-        
       data: {
         name: createSecretDto.name,
         description: createSecretDto.description,

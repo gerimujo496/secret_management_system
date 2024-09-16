@@ -1,13 +1,12 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { SecretsDAL } from './secrets.dal';
 import { AccountDAL } from '../account/account.dal';
-import { CreateSecretsDto } from './dtos/create-secrets.dto';
-import { UpdateSecretsDto } from './dtos/update-Secrets.dto';
+import { CreateSecretsDto } from './dtos/createSecrets.dto';
+import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
 import { encrypt, decrypt } from '../../common/utils/encrypt';
 
 @Injectable()

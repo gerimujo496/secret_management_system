@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
+  IsEmail,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -17,9 +18,10 @@ export class CreateSecretSharingDto {
   })
   expirationTime: Date;
   @IsString()
+  @IsEmail()
   @IsNotEmpty()
   @ApiProperty({
-    example: '2',
+    example: 'danielakokoneshi20@gmail.com',
     required: true,
   })
   receiverEmail: string;
