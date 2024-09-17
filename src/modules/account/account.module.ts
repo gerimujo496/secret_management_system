@@ -3,7 +3,7 @@ import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AccountDAL } from './dal/account.dal';
-import { ErrorDal } from 'src/common/dal/error.dal';
+import { ErrorDal } from '../../common/dal/error.dal';
 
 @Module({
   controllers: [AccountController],

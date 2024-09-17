@@ -29,13 +29,17 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const userId = request.user?.id 
+    const userId = request.user?.id;
 
     if (!userId) {
       throw new ForbiddenException(errorMessage.FORBIDDEN_ACCESS);
     }
 
     const accountId = request.params.accountId;
+
+    if (!userId || !accountId) {
+      throw new ForbiddenException(errorMessage.FORBIDDEN_ACCESS);
+    }
 
     const memberships = await this.prisma.membership.findMany({
       where: {

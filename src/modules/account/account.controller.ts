@@ -11,12 +11,12 @@ import {
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dtos/create-account.dto';
-import { AuthGuard } from 'src/common/guards/auth.guard';
+import { AuthGuard } from '../../common/guards/auth.guard';
 import { UpdateAccountDto } from './dtos/update-account.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { controller_path } from 'src/constants/controller-path';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { controller_path } from '../../constants/controller-path';
 
 @Controller(controller_path.ACCOUNT.PATH)
 @UseGuards(AuthGuard)

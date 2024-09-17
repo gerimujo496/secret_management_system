@@ -83,4 +83,26 @@ export class EmailService {
     };
     await this.sendGridClient.send(mail);
   }
+
+  async sendInvitationForAccountMembership({
+    recipient,
+    sender,
+    confirmationToken,
+    membershipId,
+  }: EmailInterface): Promise<void> {
+    const restOrUrl = confirmationToken
+      ? `${controller_path.MEMBERSHIP.CONFIRM}?membershipId=${membershipId}&token=${confirmationToken}`
+      : `${controller_path.MEMBERSHIP.REGISTER_AND_CONFIRM}?email=${recipient}&membershipId=${membershipId}`;
+
+    const mail: MailDataRequired = {
+      to: recipient,
+      from: this.configService.get<string>('MAIL_CONFIG_SENDER'),
+      templateId: this.configService.get<string>('INVITATION_EMAIL_TEMPLATE'),
+      dynamicTemplateData: {
+        name: `${sender.firstName} ${sender.lastName}`,
+        url: `${process.env.HOST}/${controller_path.MEMBERSHIP.PATH}/${restOrUrl}`,
+      },
+    };
+    await this.sendGridClient.send(mail);
+  }
 }

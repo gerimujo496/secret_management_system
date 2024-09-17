@@ -5,7 +5,6 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-
 import { UserDal } from './user.dal';
 import { EmailModule } from '../email/email.module';
 import { AuthHelper } from './auth.helper';
@@ -26,5 +25,6 @@ import { PrismaModule } from '../prisma/prisma.module';
     PrismaModule,
     EmailModule,
   ],
+  exports: [AuthService, UserDal],
 })
 export class UserModule {}
