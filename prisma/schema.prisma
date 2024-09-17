@@ -84,15 +84,13 @@ model Account {
 }
 
 model Secret {
-  id          Int    @id @default(autoincrement())
-  name        String
-  value       String
-  description String
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
+  id            Int             @id @default(autoincrement())
+  name          String
+  value         String
+  description   String
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @default(now()) @updatedAt @map("updated_at")
+  deletedAt     DateTime?       @map("deleted_at")
   AccountSecret AccountSecret[]
   SecretsShare  SecretShare[]
 
@@ -100,12 +98,14 @@ model Secret {
 }
 
 model AccountSecret {
-  id        Int @id @default(autoincrement())
-  accountId Int @map("account_id")
-  secretId  Int @map("secret_id")
-
-  accounts Account @relation(fields: [accountId], references: [id])
-  secret   Secret  @relation(fields: [secretId], references: [id])
+  id        Int       @id @default(autoincrement())
+  accountId Int       @map("account_id")
+  secretId  Int       @map("secret_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  accounts  Account   @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  secret    Secret    @relation(fields: [secretId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("Account_secrets")
 }
@@ -116,13 +116,12 @@ model SecretShare {
   accountGiverId    Int      @map("account_giver_id")
   accountReceiverId Int      @map("account_receiver_id")
   numberOfTries     Int      @map("number_of_tries")
-  passcode          Int
+  passcode          Int?
   isAccepted        Boolean  @map("is_accepted")
   secretId          Int      @map("secret_id")
-
-  accountGiver    Account @relation("accountGiver", fields: [accountGiverId], references: [id])
-  accountReceiver Account @relation("accountReciver", fields: [accountReceiverId], references: [id])
-  secret          Secret  @relation(fields: [secretId], references: [id])
+  accountGiver      Account  @relation("accountGiver", fields: [accountGiverId], references: [id])
+  accountReceiver   Account  @relation("accountReciver", fields: [accountReceiverId], references: [id])
+  secret            Secret   @relation(fields: [secretId], references: [id])
 
   @@map("Secrets_share")
 }

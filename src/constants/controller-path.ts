@@ -24,4 +24,12 @@ export const controller_path = {
     UPDATE_ROLE: ':accountId/role/:userId',
     DELETE_MEMBERSHIP: ':membershipId/:accountId',
   },
+  SECRET:{
+    PATH:'secret',
+    CREATE_SECRET:':accountId/secrets',
+    GET_ONE: ':accountId/:secretId',
+    GET_SECRETS: ':accountId/secrets',
+    UPDATE_SECRETS: ':accountId/:secretId',
+    DELETE_SECRET: ':accountId/:secretId'
+  }
 };
