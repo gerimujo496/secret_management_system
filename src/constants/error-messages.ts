@@ -28,4 +28,19 @@ export const errorMessage = {
   WRONG_AUTH_CODE: 'Wrong authentication code',
 
   CAN_NOT_SEND_EMAIL: 'Can not send email',
+  ID_REQUIRED: (id: string) => `${id} is required.`,
+
+  BOTH_REQUIRED: (id1: string, id2: string) =>
+    `${id1} and ${id2} are both required.`,
+
+  INVALID_ENTITY: (entity: string) =>
+    `Invalid ${entity} or ${entity} not found.`,
+
+  FORBIDDEN_ACCESS: 'Forbidden access.',
+
+  INVALID_ROLE: 'Please assign a valid new role.',
+
+  EMPTY_DATA: 'No data provided',
+
+  REQUIRED_ROLE: 'You do not have the required roles',
 };

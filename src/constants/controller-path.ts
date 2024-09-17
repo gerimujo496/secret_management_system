@@ -12,4 +12,16 @@ export const controller_path = {
     TWO_FA_INIT: 'two_fa_init',
     TWO_FA_ACTIVATE: 'two_fa_activate',
   },
+  ACCOUNT: {
+    PATH: 'account',
+    GET_ONE: ':accountId',
+    GET_USERS: ':accountId/users',
+    UPDATE_ACCOUNT: ':accountId',
+    DELETE_ACCOUNT: ':accountId',
+  },
+  MEMBERSHIP: {
+    PATH: 'membership',
+    UPDATE_ROLE: ':accountId/role/:userId',
+    DELETE_MEMBERSHIP: ':membershipId/:accountId',
+  },
 };

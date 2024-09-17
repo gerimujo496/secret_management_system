@@ -1,24 +1,24 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfirmEmailDto } from '../auth/dto/confirm-email.dto';
-import { errorMessage } from '../../constants/error-messages';
-import { Entities } from '../../constants/entities';
+
 import { JsonValue } from '@prisma/client/runtime/library';
+import { ErrorDal } from '../../common/dal/error.dal';
 
 @Injectable()
 export class UserDal {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private errorDal: ErrorDal,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
       return await this.prisma.user.create({ data: createUserDto });
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('create', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -29,22 +29,16 @@ export class UserDal {
       });
 
       return user;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('get by email', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
   async getAllUsers() {
     try {
       return await this.prisma.user.findMany({ where: { deletedAt: null } });
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('get all', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -55,11 +49,8 @@ export class UserDal {
       });
 
       return user;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('find', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -71,11 +62,8 @@ export class UserDal {
       });
 
       return results;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('update', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -87,11 +75,8 @@ export class UserDal {
       });
 
       return results;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('reset', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -102,11 +87,8 @@ export class UserDal {
       });
 
       return results;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('delete', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -119,10 +101,7 @@ export class UserDal {
 
       return result;
     } catch (error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('update secret  key', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      this.errorDal.handleError(error);
     }
   }
 
@@ -135,10 +114,7 @@ export class UserDal {
 
       return result;
     } catch (error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('activate 2fa', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      this.errorDal.handleError(error);
     }
   }
 }

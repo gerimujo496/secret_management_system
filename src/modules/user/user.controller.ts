@@ -22,7 +22,6 @@ import { User } from '../../common/customDecorators/user.decorator';
 import { UserDal } from './user.dal';
 import { SerializerInterceptor } from '../../common/interceptors/serialize.interceptors';
 
-
 @Controller(controller.USER)
 @ApiBearerAuth()
 @ApiTags(controller.USER)

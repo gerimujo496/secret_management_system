@@ -1,10 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserDal } from '../../user/user.dal';
 import { ConfigService } from '@nestjs/config';
 
@@ -22,7 +18,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     const user = await this.userDal.findByEmail(payload.email);
-
     if (user) {
       if (
         user.isTwoFactorAuthenticationEnabled &&

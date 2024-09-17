@@ -1,6 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
@@ -17,10 +16,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
           params.args['data'] = { deletedAt: new Date() };
         }
       }
-
       return next(params);
     });
-
     await this.$connect();
   }
 }
