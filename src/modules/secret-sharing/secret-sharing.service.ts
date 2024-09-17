@@ -11,7 +11,7 @@ import { SecretSharingDAL } from './secret-sharing.dal';
 import { SecretsDAL } from '../secrets/secrets.dal';
 import { EmailService } from '../email/email.service';
 import { UserDal } from '../user/user.dal';
-import { MembershipDAL } from '../membership/membership.dal';
+import { MembershipDAL } from '../membership/dal/membership.dal';
 import { AcceptSecretDto } from './dtos/accept-secret.dto';
 import { generateSixDigitCode } from '../../common/utils/secret-sharing';
 import { errorMessage } from '../../constants/error-messages';
@@ -189,7 +189,7 @@ export class SecretSharingService {
     if (!isKeyValid || acceptSecretDto.code !== secretShare.passcode) {
       await this.secretsSharingDAL.decrementTries(secretShareId);
       throw new BadRequestException(
-        errorMessage.NOT_FOUND('key', '6 digit code'),
+        errorMessage.NOT_FOUND,
       );
     }
     if (secretShare.numberOfTries <= 0) {
@@ -200,6 +200,7 @@ export class SecretSharingService {
       secretShare.accountReceiverId,
       secretShare.secretId,
     );
+    await this.secretsSharingDAL.decrementTries(secretShareId);
     return { message: 'Secret successfully added to your account.' };
   }
 }

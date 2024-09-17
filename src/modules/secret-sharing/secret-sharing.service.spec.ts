@@ -5,7 +5,7 @@ import { SecretsDAL } from '../secrets/secrets.dal';
 import { SecretSharingDAL } from './secret-sharing.dal';
 import { EmailService } from '../email/email.service';
 import { UserDal } from '../user/user.dal';
-import { MembershipDAL } from '../membership/membership.dal';
+import { MembershipDAL } from '../membership/dal/membership.dal';
 import { NotFoundException } from '@nestjs/common';
 
 describe('SecretSharingService', () => {

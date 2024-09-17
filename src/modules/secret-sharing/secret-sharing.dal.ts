@@ -43,20 +43,18 @@ export class SecretSharingDAL {
     }
   }
 
-  // async findSecretShareById(secretShareId: number) {
-    
-  //   return  this.prisma.secretShare.findFirst({
-  //     where: { id: secretShareId },
-  //   });
-  // }
   async findSecretShareById(secretShareId: number) {
-    console.log(`Finding secret share with ID: ${secretShareId}`);
+    try{
+
     const secretShare = await this.prisma.secretShare.findFirst({
       where: { id: secretShareId },
     });
-    console.log(`Found secret share: ${JSON.stringify(secretShare)}`);
+ 
     return secretShare;
-   
+  }
+  catch(error){
+    this.errorDAL.handleError(error);
+  }
   }
   
   async decrementTries(secretShareId: number) {

@@ -8,8 +8,8 @@ import { SecretsDAL } from '../secrets/secrets.dal';
 import { EmailService } from '../email/email.service';
 import { SendgridClient } from '../email/sendgrid-client';
 import { UserDal } from '../user/user.dal';
-import { MembershipDAL } from '../membership/membership.dal';
-import { ErrorDal } from 'src/common/dal/error.dal';
+import { MembershipDAL } from '../membership/dal/membership.dal';
+import { ErrorDal } from '../../common/dal/error.dal';
 
 @Module({
   providers: [

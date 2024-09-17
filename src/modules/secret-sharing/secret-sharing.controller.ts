@@ -23,7 +23,7 @@ import { controller_path } from '../../constants/controller-path';
 @ApiTags('secret-sharing')
 @Controller('secret-sharing')
 @UseGuards(AuthGuard)
- @UseGuards(RolesGuard)
+@UseGuards(RolesGuard)
 export class SecretSharingController {
   constructor(
     private readonly secretsSharingService: SecretSharingService,
@@ -53,7 +53,8 @@ export class SecretSharingController {
   async getSecretSharePage(
     @Param('secretShareId', ParseIntPipe) secretShareId: number,
   ) {
-    const secretShare = await this.secretShareDAL.findSecretShareById(secretShareId);
+    const secretShare =
+      await this.secretShareDAL.findSecretShareById(secretShareId);
 
     if (!secretShare) {
       throw new NotFoundException('Secret share not found');
@@ -69,7 +70,6 @@ export class SecretSharingController {
     @Param('secretShareId', ParseIntPipe) secretShareId: number,
     @Body() acceptSecretDto: AcceptSecretDto,
   ) {
-
     return await this.secretsSharingService.acceptSecret(
       secretShareId,
       acceptSecretDto,

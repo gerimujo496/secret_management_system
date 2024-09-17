@@ -88,4 +88,15 @@ export class MembershipDAL {
       this.errorDAL.handleError(error);
     }
   }
+  async findMembershipByUserId(userId: number){
+    return await this.prisma.membership.findFirst({
+      where: {
+        userId: userId,
+        deletedAt: null, 
+      },
+      include: {
+        account: true, 
+      },
+    });
+  }
 }
