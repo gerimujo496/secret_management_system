@@ -15,3 +15,5 @@ import { PrismaService } from '../prisma/prisma.service';
   exports: [SecretDAL, AccountDAL],
 })
 export class SecretsModule {}
+
+

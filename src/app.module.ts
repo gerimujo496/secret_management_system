@@ -26,6 +26,8 @@ import { SecretSharingModule } from './modules/secret-sharing/secret-sharing.mod
       envFilePath: '.env.dev',
     }),
     PrismaModule,
+    SecretsModule,
+    SecretSharingModule,
     UserModule,
     EmailModule,
     PassportModule,

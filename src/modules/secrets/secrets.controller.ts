@@ -17,10 +17,10 @@ import { AuthGuard } from '../../common/guards/auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
-import { controller_path } from '../../constants/controller-path';
+import { controller_path } from 'src/constants/controller-path';
 
-@ApiTags('secrets')
-@Controller('secrets')
+@ApiTags(controller_path.SECRET.PATH)
+@Controller(controller_path.SECRET.PATH)
 @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class SecretsController {
