@@ -13,6 +13,9 @@ import { SecretsController } from './modules/secrets/secrets.controller';
 import { SecretsModule } from './modules/secrets/secrets.module';
 import { SecretSharingModule } from './modules/secret-sharing/secret-sharing.module';
 
+
+
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,11 +29,9 @@ import { SecretSharingModule } from './modules/secret-sharing/secret-sharing.mod
     EmailModule,
     AccountModule,
     MembershipModule,
+    SecretsModule, SecretSharingModule
   ],
-  controllers: [AppController, SecretsController],
-  providers: [AppService, SecretsService],
-
-  
- 
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SecretSharingService } from './secret-sharing.service';
 import { AccountDAL } from '../account/dal/account.dal';
-import { SecretsDAL } from '../secrets/secrets.dal';
+import { SecretDAL } from '../secrets/secret.dal';
 import { SecretSharingDAL } from './secret-sharing.dal';
 import { EmailService } from '../email/email.service';
 import { UserDal } from '../user/user.dal';
@@ -11,7 +11,7 @@ import { NotFoundException } from '@nestjs/common';
 describe('SecretSharingService', () => {
   let service: SecretSharingService;
   let accountDAL: AccountDAL;
-  let secretsDAL: SecretsDAL;
+  let secretsDAL: SecretDAL;
   let secretSharingDAL: SecretSharingDAL;
   let emailService: EmailService;
   let usersDAL: UserDal;
@@ -22,7 +22,7 @@ describe('SecretSharingService', () => {
       providers: [
         SecretSharingService,
         { provide: AccountDAL, useValue: { findAccount: jest.fn() } },
-        { provide: SecretsDAL, useValue: { findSecretById: jest.fn() } },
+        { provide: SecretDAL, useValue: { findSecretById: jest.fn() } },
         {
           provide: SecretSharingDAL,
           useValue: {
@@ -48,7 +48,7 @@ describe('SecretSharingService', () => {
 
     service = module.get<SecretSharingService>(SecretSharingService);
     accountDAL = module.get<AccountDAL>(AccountDAL);
-    secretsDAL = module.get<SecretsDAL>(SecretsDAL);
+    secretsDAL = module.get<SecretDAL>(SecretDAL);
     secretSharingDAL = module.get<SecretSharingDAL>(SecretSharingDAL);
     emailService = module.get<EmailService>(EmailService);
     usersDAL = module.get<UserDal>(UserDal);

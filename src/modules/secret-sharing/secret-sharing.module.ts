@@ -4,7 +4,7 @@ import { SecretSharingController } from './secret-sharing.controller';
 import { AccountDAL } from '../account/dal/account.dal';
 import { PrismaService } from '../prisma/prisma.service';
 import { SecretSharingDAL } from './secret-sharing.dal';
-import { SecretsDAL } from '../secrets/secrets.dal';
+import { SecretDAL } from '../secrets/secret.dal';
 import { EmailService } from '../email/email.service';
 import { SendgridClient } from '../email/sendgrid-client';
 import { UserDal } from '../user/user.dal';
@@ -17,7 +17,7 @@ import { ErrorDal } from '../../common/dal/error.dal';
     AccountDAL,
     PrismaService,
     SecretSharingDAL,
-    SecretsDAL,
+    SecretDAL,
     EmailService,
     SendgridClient,
     UserDal,

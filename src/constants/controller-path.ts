@@ -20,6 +20,9 @@ export const controller_path = {
     PATH: 'membership',
     UPDATE_ROLE: ':accountId/role/:userId',
     DELETE_MEMBERSHIP: ':membershipId/:accountId',
+    CONFIRM: 'confirm',
+    REGISTER_AND_CONFIRM: 'register/confirm',
+    INVITE_USER: ':accountId',
   },
   SECRET: {
     PATH: 'secret',

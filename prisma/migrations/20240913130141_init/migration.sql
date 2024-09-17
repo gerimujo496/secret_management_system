@@ -36,9 +36,6 @@ CREATE TABLE "Memberships" (
 CREATE TABLE "Roles" (
     "id" SERIAL NOT NULL,
     "role_name" "UserRoles" NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "Roles_pkey" PRIMARY KEY ("id")
 );

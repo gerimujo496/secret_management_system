@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SecretsService } from './secrets.service';
-import { SecretsDAL } from './secrets.dal';
+import { SecretDAL } from './secret.dal';
 import { AccountDAL } from '../account/dal/account.dal';
-import { CreateSecretsDto } from './dtos/create-secrets.dto';
+import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import * as encryptUtils from '../../common/utils/encrypt';
 import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateSecretsDto } from './dtos/update-secrets.dto';
+import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
 
 jest.mock('../../common/utils/encrypt', () => ({
   encrypt: jest.fn(),
@@ -17,7 +17,7 @@ jest.mock('../../common/utils/encrypt', () => ({
 
 describe('SecretsService', () => {
   let service: SecretsService;
-  let secretsDAL: SecretsDAL;
+  let secretsDAL: SecretDAL;
   let accountDAL: AccountDAL;
 
   beforeEach(async () => {
@@ -25,7 +25,7 @@ describe('SecretsService', () => {
       providers: [
         SecretsService,
         {
-          provide: SecretsDAL,
+          provide: SecretDAL,
           useValue: {
             createSecret: jest.fn(),
             findAllSecrets: jest.fn(),
@@ -39,7 +39,7 @@ describe('SecretsService', () => {
     }).compile();
 
     service = module.get<SecretsService>(SecretsService);
-    secretsDAL = module.get<SecretsDAL>(SecretsDAL);
+    secretsDAL = module.get<SecretDAL>(SecretDAL);
     accountDAL = module.get<AccountDAL>(AccountDAL);
   });
   const account = {

@@ -8,7 +8,7 @@ import { AccountDAL } from '../account/dal/account.dal';
 import { generateKey } from '../../common/utils/secret-sharing';
 import { CreateSecretSharingDto } from './dtos/create-secret-sharing.dto';
 import { SecretSharingDAL } from './secret-sharing.dal';
-import { SecretsDAL } from '../secrets/secrets.dal';
+import { SecretDAL } from '../secrets/secret.dal';
 import { EmailService } from '../email/email.service';
 import { UserDal } from '../user/user.dal';
 import { MembershipDAL } from '../membership/dal/membership.dal';
@@ -19,7 +19,7 @@ import { errorMessage } from '../../constants/error-messages';
 export class SecretSharingService {
   constructor(
     private readonly accountDAL: AccountDAL,
-    private readonly secretsDAL: SecretsDAL,
+    private readonly secretsDAL: SecretDAL,
     private readonly secretsSharingDAL: SecretSharingDAL,
     private readonly emailService: EmailService,
     private readonly usersDAL: UserDal,

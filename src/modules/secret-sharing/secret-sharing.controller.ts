@@ -23,7 +23,7 @@ import { controller_path } from '../../constants/controller-path';
 @ApiTags('secret-sharing')
 @Controller('secret-sharing')
  @UseGuards(AuthGuard)
- @UseGuards(RolesGuard)
+@UseGuards(RolesGuard)
 export class SecretSharingController {
   constructor(
     private readonly secretsSharingService: SecretSharingService,
