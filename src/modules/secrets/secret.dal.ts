@@ -2,17 +2,18 @@ import { Injectable } from '@nestjs/common';
 
 import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
-import { ErrorDal } from 'src/common/dal/error.dal';
+import { ErrorDal } from '../../common/dal/error.dal';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class SecretsDAL {
-  constructor(private readonly prisma: PrismaService,
+export class SecretDAL {
+  constructor(
+    private readonly prisma: PrismaService,
     private errorDAL: ErrorDal,
   ) {}
   async createSecret(createSecretDto: CreateSecretsDto, accountId: number) {
-    try{
-      const secret= await this.prisma.secret.create({
+    try {
+      const secret = await this.prisma.secret.create({
         data: {
           name: createSecretDto.name,
           description: createSecretDto.description,
@@ -24,11 +25,10 @@ export class SecretsDAL {
           },
         },
       });
-      return secret
+      return secret;
+    } catch (error) {
+      this.errorDAL.handleError(error);
     }
-   catch(error){
-    this.errorDAL.handleError(error);
-   }
   }
 
   async findAllSecrets(accountId: number) {
@@ -59,25 +59,24 @@ export class SecretsDAL {
     updateSecretDto: UpdateSecretsDto,
     accountId: number,
   ) {
-    try{const secret = await this.findSecretById(id, accountId);
-   
-    return await this.prisma.secret.update({
-      where: { id },
-      data: updateSecretDto,
-    });}
-    catch(error){
-      this.errorDAL.handleError(error)
+    try {
+      await this.findSecretById(id, accountId);
+      return await this.prisma.secret.update({
+        where: { id },
+        data: updateSecretDto,
+      });
+    } catch (error) {
+      this.errorDAL.handleError(error);
     }
   }
 
   async deleteSecret(id: number, accountId: number) {
-    try{
-      const secret = await this.findSecretById(id, accountId);
-    return await this.prisma.secret.delete({
-      where: { id },
-    });
-    }
-    catch(error){
+    try {
+      await this.findSecretById(id, accountId);
+      return await this.prisma.secret.delete({
+        where: { id },
+      });
+    } catch (error) {
       this.errorDAL.handleError(error);
     }
   }

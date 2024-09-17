@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { AccountDAL } from '../account/account.dal';
+import { AccountDAL } from '../account/dal/account.dal';
 import { generateKey } from '../../common/utils/secretSharing';
 import { CreateSecretSharingDto } from './dtos/create-secretSharing.dto';
 import { SecretSharingDAL } from './secret-sharing.dal';
@@ -13,7 +13,7 @@ export class SecretSharingService {
   ) {}
 
   async genereateKey(accountId: number) {
-    const account = await this.accountDAL.findAccountById(accountId);
+    const account = await this.accountDAL.findAccount(accountId);
     if (!account) {
       throw new NotFoundException('Account not found');
     }
@@ -26,7 +26,7 @@ export class SecretSharingService {
   }
   async shareSecret(createSecretSharingDto: CreateSecretSharingDto, accountGiverId: number) {
  
-    const accountGiver = await this.accountDAL.findAccountById(accountGiverId);
+    const accountGiver = await this.accountDAL.findAccount(accountGiverId);
     if (!accountGiver) {
       throw new NotFoundException('Account giver not found');
     }

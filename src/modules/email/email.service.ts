@@ -6,6 +6,7 @@ import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
 import { ConfigService } from '@nestjs/config';
 import { CreateSecretsDto } from '../secrets/dtos/createSecrets.dto';
+import { errorMessage } from 'src/constants/error-messages';
 
 @Injectable()
 export class EmailService {
@@ -44,7 +45,6 @@ export class EmailService {
         url: `${process.env.HOST}/secret-sharing/accept-secret/${secretShareId}`,
       },
     };
-    console.log(secretShareId);
     await this.sendGridClient.send(mail);
   }
 
@@ -61,11 +61,9 @@ export class EmailService {
     };
     try {
       await this.sendGridClient.send(mail);
-      console.log('Email successfully dispatched to:', recipient);
     } catch (error) {
-      console.error('Error sending email:', error);
       throw new InternalServerErrorException(
-        'Could not send verification code email.',
+       errorMessage.INTERNAL_SERVER_ERROR('send','verification code')
       );
     }
   }

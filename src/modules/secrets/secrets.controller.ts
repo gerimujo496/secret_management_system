@@ -21,7 +21,7 @@ import { UserRoles } from '@prisma/client';
 import { controller_path } from 'src/constants/controller-path';
 @ApiTags('secrets')
 @Controller('secrets')
-// @UseGuards(AuthGuard)
+ @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class SecretsController {
   constructor(private readonly secretsService: SecretsService) {}

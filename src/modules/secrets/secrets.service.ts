@@ -3,33 +3,40 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { SecretsDAL } from './secrets.dal';
+import { SecretDAL } from './secret.dal';
 import { AccountDAL } from '../account/dal/account.dal';
 import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
 import { encrypt, decrypt } from '../../common/utils/encrypt';
 import { errorMessage } from 'src/constants/error-messages';
+
 @Injectable()
 export class SecretsService {
   constructor(
-    private readonly secretsDAL: SecretsDAL,
+    private readonly secretsDAL: SecretDAL,
     private readonly accountsDAL: AccountDAL,
   ) {}
 
   async createSecret(createSecretDto: CreateSecretsDto, accountId: number) {
     const account = await this.accountsDAL.findAccount(accountId);
+
     if (!account) {
       throw new NotFoundException(errorMessage.NOT_FOUND('account'));
     }
+
     const encryptedValue = encrypt(createSecretDto.value, account.password);
 
     const createdSecret = await this.secretsDAL.createSecret(
       { ...createSecretDto, value: encryptedValue },
       accountId,
     );
+
     if (!createdSecret) {
-      throw new BadRequestException(errorMessage.INTERNAL_SERVER_ERROR('create','secret'));
+      throw new BadRequestException(
+        errorMessage.INTERNAL_SERVER_ERROR('create', 'secret'),
+      );
     }
+
     return createdSecret;
   }
 
@@ -37,6 +44,7 @@ export class SecretsService {
     const secrets = await this.secretsDAL.findAllSecrets(accountId);
 
     const account = await this.accountsDAL.findAccount(accountId);
+
     if (!account) {
       throw new NotFoundException(errorMessage.NOT_FOUND('account'));
     }
@@ -45,20 +53,22 @@ export class SecretsService {
       const decryptedValue = decrypt(secret.value, account.password);
       return { ...secret, value: decryptedValue };
     });
+
     return decryptedSecrets;
   }
 
   async findSecretByIdAndAccount(accountId: number, secretId: number) {
     const secret = await this.secretsDAL.findSecretById(secretId, accountId);
+
     if (!secret) {
-      throw new NotFoundException(
-        errorMessage.NOT_FOUND('secret'),
-      );
+      throw new NotFoundException(errorMessage.NOT_FOUND('secret'));
     }
     const account = await this.accountsDAL.findAccount(accountId);
+
     if (!account) {
       throw new NotFoundException(errorMessage.NOT_FOUND('account'));
     }
+
     const decryptedValue = decrypt(secret.value, account.password);
     return { ...secret, value: decryptedValue };
   }
@@ -69,16 +79,20 @@ export class SecretsService {
     updateSecretDto: UpdateSecretsDto,
   ) {
     const secret = await this.findSecretByIdAndAccount(accountId, secretId);
+
     if (!secret) {
       throw new NotFoundException(errorMessage.NOT_FOUND('secret'));
     }
+
     const account = await this.accountsDAL.findAccount(accountId);
+
     if (!account) {
       throw new NotFoundException(errorMessage.NOT_FOUND('account'));
     }
     if (updateSecretDto.value) {
       updateSecretDto.value = encrypt(updateSecretDto.value, account.password);
     }
+
     return await this.secretsDAL.updateSecret(
       secretId,
       updateSecretDto,
@@ -88,6 +102,7 @@ export class SecretsService {
 
   async deleteSecret(accountId: number, secretId: number) {
     const secret = await this.findSecretByIdAndAccount(accountId, secretId);
+
     if (!secret) {
       throw new NotFoundException(errorMessage.NOT_FOUND('secret'));
     }
