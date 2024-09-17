@@ -5,167 +5,99 @@ import {
 } from '@nestjs/common';
 import { CreateAccountDto } from './dtos/create-account.dto';
 import { generate } from 'generate-password';
-import { UserRoles } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
 import { UpdateAccountDto } from './dtos/update-account.dto';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { AccountDAL } from './dal/account.dal';
+import { validateNonEmptyObject } from 'src/common/util/validator';
+import { errorMessage } from 'src/constants/error-messages';
 
 @Injectable()
 export class AccountService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private accountDAL: AccountDAL) {}
 
   async createAccount(data: CreateAccountDto, userId: number) {
-    try {
-      if (!userId) return null;
+    if (!userId)
+      throw new BadRequestException(errorMessage.ID_REQUIRED('User ID'));
 
-      const user = await this.prisma.user.findFirst({
-        where: { id: userId, isConfirmed: true },
-      });
+    const user = await this.accountDAL.findUserById(userId);
 
-      if (!user) {
-        throw new NotFoundException('Invalid user or not found.');
-      }
-
-      if (Object.keys(data).length === 0) {
-        throw new BadRequestException('No data provided.');
-      }
-
-      const password = generate({
-        length: 15,
-        numbers: true,
-      });
-
-      const accountInformation = {
-        ...data,
-        password,
-      };
-
-      const account = await this.prisma.account.create({
-        data: accountInformation,
-      });
-
-      const role = await this.prisma.role.findFirst({
-        where: { roleName: UserRoles.ADMIN },
-      });
-
-      await this.prisma.membership.create({
-        data: {
-          userId,
-          accountId: account.id,
-          roleId: role.id,
-          isConfirmed: true,
-        },
-      });
-
-      return account;
-    } catch (error) {
-      return new ExceptionsHandler(error);
+    if (!user) {
+      throw new NotFoundException(errorMessage.INVALID_ENTITY('user'));
     }
+
+    const password = generate({
+      length: 15,
+      numbers: true,
+    });
+
+    const [account, membership] =
+      await this.accountDAL.createMembershipAndAccount(data, userId, password);
+
+    return { account, membership };
   }
 
   async getMyAccount(userId: number, accountId: number) {
-    try {
-      if (!userId || !accountId) return null;
+    if (!userId || !accountId)
+      throw new BadRequestException(
+        errorMessage.BOTH_REQUIRED('User ID', 'Account ID'),
+      );
 
-      const membership = await this.prisma.membership.findFirst({
-        where: {
-          accountId,
-          userId,
-          isConfirmed: true,
-          deletedAt: null,
-        },
-      });
+    const account = await this.accountDAL.findAccount(accountId);
 
-      if (!membership) {
-        throw new BadRequestException('Bad request.');
-      }
-
-      return await this.prisma.account.findFirst({
-        where: { id: accountId },
-      });
-    } catch (error) {
-      return new ExceptionsHandler(error.response);
+    if (!account) {
+      throw new NotFoundException(errorMessage.INVALID_ENTITY('account'));
     }
+
+    const membership = await this.accountDAL.findMembership(accountId, userId);
+
+    if (!membership) {
+      throw new NotFoundException(errorMessage.INVALID_ENTITY('membership'));
+    }
+
+    return account;
   }
 
   async getAccountUsers(accountId: number) {
-    try {
-      if (!accountId) return null;
+    if (!accountId)
+      throw new BadRequestException(errorMessage.ID_REQUIRED('Account ID'));
 
-      const usersList = await this.prisma.membership.findMany({
-        where: { accountId, deletedAt: null, isConfirmed: true },
-        select: {
-          role: {
-            select: {
-              roleName: true,
-            },
-          },
-          user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
-            },
-          },
-        },
-      });
-
-      return usersList || [];
-    } catch (error) {
-      return new ExceptionsHandler(error.response);
-    }
+    return await this.accountDAL.findUsersMembershipsByAccount(accountId);
   }
 
   async updateAccount(
     accountId: number,
     newAccountInformation: UpdateAccountDto,
   ) {
-    try {
-      if (!accountId) return null;
+    if (!accountId)
+      throw new BadRequestException(errorMessage.ID_REQUIRED('Account ID'));
 
-      if (Object.keys(newAccountInformation).length === 0) {
-        throw new BadRequestException('No data provided.');
-      }
+    validateNonEmptyObject(newAccountInformation, errorMessage.EMPTY_DATA);
 
-      const currentAccount = await this.prisma.account.findFirst({
-        where: { id: accountId, deletedAt: null },
-      });
+    const currentAccount = await this.accountDAL.findAccount(accountId);
 
-      if (!currentAccount) {
-        throw new BadRequestException('Bad request.');
-      }
-
-      return await this.prisma.account.update({
-        where: { id: currentAccount.id },
-        data: { ...newAccountInformation },
-      });
-    } catch (error) {
-      return new ExceptionsHandler(error.response);
+    if (!currentAccount) {
+      throw new NotFoundException(errorMessage.INVALID_ENTITY('account'));
     }
+
+    return await this.accountDAL.updateAccount(
+      currentAccount.id,
+      newAccountInformation,
+    );
   }
 
   async deleteAccount(accountId: number) {
-    try {
-      if (!accountId) return null;
+    if (!accountId)
+      throw new BadRequestException(errorMessage.ID_REQUIRED('Account ID'));
 
-      const memberships = await this.prisma.membership.findMany({
-        where: { accountId, isConfirmed: true, deletedAt: null },
-      });
+    const memberships =
+      await this.accountDAL.findAllMembershipsForAccount(accountId);
 
-      if (memberships.length === 0) {
-        return memberships;
-      }
-
-      await this.prisma.membership.deleteMany({
-        where: { accountId, deletedAt: null },
-      });
-
-      return await this.prisma.account.delete({
-        where: { id: accountId, deletedAt: null },
-      });
-    } catch (error) {
-      return new ExceptionsHandler(error.response);
+    if (memberships.length === 0) {
+      return new NotFoundException(errorMessage.INVALID_ENTITY('account'));
     }
+
+    const [deletedAccount, deletedMemberships] =
+      await this.accountDAL.deleteMembershipsAndAccount(accountId);
+
+    return { deletedAccount, deletedMemberships };
   }
 }

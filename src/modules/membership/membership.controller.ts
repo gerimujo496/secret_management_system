@@ -17,36 +17,37 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { controller_path } from 'src/constants/controller-path';
 
-@Controller('membership')
-// @UseGuards(AuthGuard)
+@Controller(controller_path.MEMBERSHIP.PATH)
+@UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class MembershipController {
   constructor(private membershipService: MembershipService) {}
 
-  @Get('/confirm')
-  @Render('index')
-  confirmInvitation(@Query() query: any) {
-    return this.membershipService.confirmInvitation(
-      parseInt(query.membershipId),
-    );
-  }
+  // @Get('/confirm')
+  // @Render('index')
+  // confirmInvitation(@Query() query: any) {
+  //   return this.membershipService.confirmInvitation(
+  //     parseInt(query.membershipId),
+  //   );
+  // }
 
-  @Post('/:accountId/:userId')
-  @Roles(UserRoles.ADMIN)
-  inviteUser(
-    @Param('accountId') accountId: string,
-    @Param('userId') userId: string,
-    @Request() request: any,
-  ) {
-    return this.membershipService.inviteUser(
-      parseInt(accountId),
-      parseInt(userId),
-      parseInt(request.user?.id),
-    );
-  }
+  // @Post('/:accountId/:userId')
+  // @Roles(UserRoles.ADMIN)
+  // inviteUser(
+  //   @Param('accountId') accountId: string,
+  //   @Param('userId') userId: string,
+  //   @Request() request: any,
+  // ) {
+  //   return this.membershipService.inviteUser(
+  //     parseInt(accountId),
+  //     parseInt(userId),
+  //     parseInt(request.user?.id),
+  //   );
+  // }
 
-  @Patch('/:accountId/role/:userId')
+  @Patch(controller_path.MEMBERSHIP.UPDATE_ROLE)
   @Roles(UserRoles.ADMIN)
   updateUserRole(
     @Param('userId') userId: string,
@@ -60,7 +61,7 @@ export class MembershipController {
     });
   }
 
-  @Delete('/:membershipId/:accountId')
+  @Delete(controller_path.MEMBERSHIP.DELETE_MEMBERSHIP)
   @Roles(UserRoles.ADMIN)
   deleteMembership(
     @Param('membershipId') membershipId: string,

@@ -13,13 +13,13 @@ import { AccountService } from './account.service';
 import { CreateAccountDto } from './dtos/create-account.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { UpdateAccountDto } from './dtos/update-account.dto';
-
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { controller_path } from 'src/constants/controller-path';
 
-@Controller('account')
-// @UseGuards(AuthGuard)
+@Controller(controller_path.ACCOUNT.PATH)
+@UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class AccountController {
   constructor(private accountService: AccountService) {}
@@ -30,19 +30,19 @@ export class AccountController {
     return this.accountService.createAccount(body, userId);
   }
 
-  @Get('/:accountId')
+  @Get(controller_path.ACCOUNT.GET_ONE)
   @Roles(UserRoles.ADMIN)
   getMyAccount(@Param('accountId') accountId: string, @Request() req: any) {
     return this.accountService.getMyAccount(req.user?.id, parseInt(accountId));
   }
 
-  @Get('/:accountId/users')
+  @Get(controller_path.ACCOUNT.GET_USERS)
   @Roles(UserRoles.ADMIN, UserRoles.EDITOR, UserRoles.VIEWER)
   getAccountUsers(@Param('accountId') accountId: string) {
     return this.accountService.getAccountUsers(parseInt(accountId));
   }
 
-  @Patch('/:accountId')
+  @Patch(controller_path.ACCOUNT.UPDATE_ACCOUNT)
   @Roles(UserRoles.ADMIN)
   updateAccount(
     @Param('accountId') accountId: string,
@@ -51,7 +51,7 @@ export class AccountController {
     return this.accountService.updateAccount(parseInt(accountId), body);
   }
 
-  @Delete('/:accountId')
+  @Delete(controller_path.ACCOUNT.DELETE_ACCOUNT)
   @Roles(UserRoles.ADMIN)
   deleteAccount(@Param('accountId') accountId: string) {
     return this.accountService.deleteAccount(parseInt(accountId));

@@ -4,9 +4,9 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/user/user.module';
 import { EmailModule } from './modules/email/email.module';
-import { MembershipModule } from './modules/membership/membership.module';
-import { AccountModule } from './modules/account/account.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
+import { AccountModule } from './modules/account/account.module';
+import { MembershipModule } from './modules/membership/membership.module';
 
 @Module({
   imports: [
@@ -17,8 +17,8 @@ import { PrismaModule } from './modules/prisma/prisma.module';
     PrismaModule,
     UserModule,
     EmailModule,
-    MembershipModule,
     AccountModule,
+    MembershipModule,
   ],
   controllers: [AppController],
   providers: [AppService],
