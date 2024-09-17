@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { UserModule } from './user.module';
 import { ConfigModule } from '@nestjs/config';
 import { CreateUserDto } from './dto/create-user.dto';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserDal } from './user.dal';
 import {
