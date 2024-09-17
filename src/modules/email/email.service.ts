@@ -1,9 +1,4 @@
-import {
-  ExecutionContext,
-  Injectable,
-  Request,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MailDataRequired } from '@sendgrid/mail';
 import { SendgridClient } from './sendgrid-client';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
@@ -84,6 +79,28 @@ export class EmailService {
       dynamicTemplateData: {
         userName: `${user.firstName} ${user.lastName}`,
         url: `${this.configService.get<string>('HOST')}/${controller.AUTH}/${controller_path.AUTH.RESET_PASSWORD_FORM}?token=${user.confirmationToken}`,
+      },
+    };
+    await this.sendGridClient.send(mail);
+  }
+
+  async sendInvitationForAccountMembership({
+    recipient,
+    sender,
+    confirmationToken,
+    membershipId,
+  }: EmailInterface): Promise<void> {
+    const restOfUrl = confirmationToken
+      ? `${controller_path.MEMBERSHIP.CONFIRM}?membershipId=${membershipId}&token=${confirmationToken}`
+      : `${controller_path.MEMBERSHIP.REGISTER_AND_CONFIRM}?email=${recipient}&membershipId=${membershipId}`;
+
+    const mail: MailDataRequired = {
+      to: recipient,
+      from: this.configService.get<string>('MAIL_CONFIG_SENDER'),
+      templateId: 'd-521b57a29ccc4fd2b161a39ebe16b0d6',
+      dynamicTemplateData: {
+        name: `${sender.firstName} ${sender.lastName}`,
+        url: `${process.env.HOST}/${controller_path.MEMBERSHIP.PATH}/${restOfUrl}`,
       },
     };
     await this.sendGridClient.send(mail);

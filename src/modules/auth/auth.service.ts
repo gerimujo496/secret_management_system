@@ -10,7 +10,6 @@ import {
 import { scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 
-import { UserService } from '../user/user.service';
 import { EmailService } from '../email/email.service';
 import { AuthHelper } from './auth.helper';
 import { UserDal } from '../user/user.dal';
@@ -32,7 +31,6 @@ const scrypt = promisify(_scrypt);
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UserService,
     private usersDal: UserDal,
     private emailService: EmailService,
     private authHelper: AuthHelper,
@@ -132,6 +130,17 @@ export class AuthService {
 
     return confirmationToken;
   }
+
+  /**
+   * Solves equations of the form a * x = b
+   * @example
+   * // returns 2
+   * globalNS.method1(5, 10);
+   * @example
+   * // returns 3
+   * globalNS.method(5, 15);
+   * @returns {Number} Returns the value of x for the equation.
+   */
 
   async getUserFromTokenOrThrowErrorIfTokenIsNotValidOrUserDoNotExists(
     token: string,

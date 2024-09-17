@@ -43,4 +43,10 @@ export const errorMessage = {
   EMPTY_DATA: 'No data provided',
 
   REQUIRED_ROLE: 'You do not have the required roles',
+
+  MEMBERSHIP_EXISTS: 'User already has a membership for this account.',
+
+  INVITATION_EXISTS: 'User already has a invitation for this account.',
+
+  INVITATION_NOT_FOUND: 'Invitation not found or already confirmed.',
 };

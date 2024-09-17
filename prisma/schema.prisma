@@ -36,12 +36,12 @@ model User {
 
 model Membership {
   id          Int      @id @default(autoincrement())
-  userId      Int      @map("user_id")
+  userId      Int?     @map("user_id")
   accountId   Int      @map("account_id")
   roleId      Int      @map("role_id")
   isConfirmed Boolean? @map("is_confirmed")
 
-  user    User    @relation(fields: [userId], references: [id])
+  user    User?   @relation(fields: [userId], references: [id])
   role    Role    @relation(fields: [roleId], references: [id])
   account Account @relation(fields: [accountId], references: [id])
 

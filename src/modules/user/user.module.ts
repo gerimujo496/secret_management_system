@@ -11,6 +11,6 @@ import { ErrorDal } from '../../common/dal/error.dal';
   controllers: [UserController],
   providers: [UserService, UserDal, ErrorDal],
   imports: [PrismaModule, EmailModule, forwardRef(() => PassportModule)],
-  exports: [UserDal, UserService],
+  exports: [UserDal, UserService, UserService],
 })
 export class UserModule {}
