@@ -38,7 +38,7 @@ export const controller_path = {
   SECRETSHARE: {
     PATH: 'secret-sharing',
     GET_KEY: 'get_key/:accountId',
-    CREATE_SHARE_SECRET: 'create_share_secret/:accountGiverId',
+    CREATE_SHARE_SECRET: 'create_share_secret/:accountId',
     GET_SHARE_SECRET_FORM: '/:secretShareId',
     POST_NEW_SHARE_SECRET: '/:secretShareId',
   },
