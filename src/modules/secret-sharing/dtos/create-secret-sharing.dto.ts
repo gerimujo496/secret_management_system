@@ -42,9 +42,6 @@ export class CreateSecretSharingDto {
   secretId: number;
   @IsNumber()
   @IsOptional()
-  @ApiProperty({
-    example: '6',
-    required: true,
-  })
+ 
   passcode: number | null;
 }

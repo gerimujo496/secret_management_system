@@ -14,11 +14,11 @@ import { SecretsService } from './secrets.service';
 import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
-import { controller_path } from 'src/constants/controller-path';
+import { controller_path } from '../../constants/controller-path';
 
 @ApiTags(controller_path.SECRET.PATH)
 @Controller(controller_path.SECRET.PATH)
