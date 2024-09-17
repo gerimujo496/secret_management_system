@@ -22,7 +22,7 @@ import { controller_path } from '../../constants/controller-path';
 @ApiTags('secrets')
 @Controller('secrets')
 // @UseGuards(AuthGuard)
-// @UseGuards(RolesGuard)
+@UseGuards(RolesGuard)
 export class SecretsController {
   constructor(private readonly secretsService: SecretsService) {}
 

@@ -23,10 +23,26 @@ describe('SecretSharingService', () => {
         SecretSharingService,
         { provide: AccountDAL, useValue: { findAccount: jest.fn() } },
         { provide: SecretsDAL, useValue: { findSecretById: jest.fn() } },
-        { provide: SecretSharingDAL, useValue: { createSecretShare: jest.fn(), findSecretShareById: jest.fn(), updateSecretSharing: jest.fn() } },
-        { provide: EmailService, useValue: { sendVerificationCodeEmail: jest.fn(), secretSharingEmail: jest.fn() } },
+        {
+          provide: SecretSharingDAL,
+          useValue: {
+            createSecretShare: jest.fn(),
+            findSecretShareById: jest.fn(),
+            updateSecretSharing: jest.fn(),
+          },
+        },
+        {
+          provide: EmailService,
+          useValue: {
+            sendVerificationCodeEmail: jest.fn(),
+            secretSharingEmail: jest.fn(),
+          },
+        },
         { provide: UserDal, useValue: { findByEmail: jest.fn() } },
-        { provide: MembershipDAL, useValue: { findMembershipByUserId: jest.fn() } },
+        {
+          provide: MembershipDAL,
+          useValue: { findMembershipByUserId: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -49,7 +65,7 @@ describe('SecretSharingService', () => {
     deletedAt: null,
   };
 
-  const expirationTimeString = "2024-12-31T23:59:59.999Z";
+  const expirationTimeString = '2024-12-31T23:59:59.999Z';
   const expirationTime = new Date(expirationTimeString);
 
   describe('genereateKey', () => {
@@ -73,12 +89,16 @@ describe('SecretSharingService', () => {
       jest.spyOn(usersDAL, 'findByEmail').mockResolvedValue(null);
 
       await expect(
-        service.shareSecret({
-          receiverEmail: 'test@test.com', secretId: 1,
-          expirationTime: expirationTime,
-          numberOfTries: 2,
-          passcode: 2
-        }, 1),
+        service.shareSecret(
+          {
+            receiverEmail: 'test@test.com',
+            secretId: 1,
+            expirationTime: expirationTime,
+            numberOfTries: 2,
+            passcode: 2,
+          },
+          1,
+        ),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -100,12 +120,16 @@ describe('SecretSharingService', () => {
       jest.spyOn(secretsDAL, 'findSecretById').mockResolvedValue(null);
 
       await expect(
-        service.shareSecret({
-          receiverEmail: 'john.doe@example.com', secretId: 1,
-          expirationTime: expirationTime,
-          numberOfTries: 2,
-          passcode: 2
-        }, 1),
+        service.shareSecret(
+          {
+            receiverEmail: 'john.doe@example.com',
+            secretId: 1,
+            expirationTime: expirationTime,
+            numberOfTries: 2,
+            passcode: 2,
+          },
+          1,
+        ),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -144,20 +168,23 @@ describe('SecretSharingService', () => {
         isAccepted: false,
         secretId: 789,
       });
-      jest.spyOn(emailService, 'secretSharingEmail').mockResolvedValue(Promise.resolve());
+      jest
+        .spyOn(emailService, 'secretSharingEmail')
+        .mockResolvedValue(Promise.resolve());
 
       const result = await service.shareSecret(
         {
-          receiverEmail: 'test@test.com', secretId: 1,
+          receiverEmail: 'test@test.com',
+          secretId: 1,
           expirationTime: expirationTime,
           numberOfTries: 2,
-          passcode: 2
-        }, 1
+          passcode: 2,
+        },
+        1,
       );
 
       expect(result).toEqual({ id: 1 });
       expect(emailService.secretSharingEmail).toHaveBeenCalled();
     });
   });
-
 });

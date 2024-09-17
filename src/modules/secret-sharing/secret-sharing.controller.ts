@@ -22,8 +22,8 @@ import { controller_path } from '../../constants/controller-path';
 
 @ApiTags('secret-sharing')
 @Controller('secret-sharing')
-@UseGuards(AuthGuard)
-@UseGuards(RolesGuard)
+ @UseGuards(AuthGuard)
+ @UseGuards(RolesGuard)
 export class SecretSharingController {
   constructor(
     private readonly secretsSharingService: SecretSharingService,
@@ -32,9 +32,13 @@ export class SecretSharingController {
 
   @Get(controller_path.SECRETSHARE.GET_KEY)
   @Roles(UserRoles.ADMIN)
+  @Get(controller_path.SECRETSHARE.GET_KEY)
+  @Roles(UserRoles.ADMIN)
   async generateKey(@Param('accountId', ParseIntPipe) accountId: number) {
     return this.secretsSharingService.genereateKey(accountId);
   }
+  @Post(controller_path.SECRETSHARE.CREATE_SHARE_SECRET)
+  @Roles(UserRoles.ADMIN)
   @Post(controller_path.SECRETSHARE.CREATE_SHARE_SECRET)
   @Roles(UserRoles.ADMIN)
   async shareSecret(
@@ -47,6 +51,8 @@ export class SecretSharingController {
     );
   }
 
+  @Get(controller_path.SECRETSHARE.GET_SHARE_SECRET_FORM)
+  @Roles(UserRoles.ADMIN)
   @Get(controller_path.SECRETSHARE.GET_SHARE_SECRET_FORM)
   @Roles(UserRoles.ADMIN)
   @Render('share-secretKey.hbs')
@@ -63,6 +69,8 @@ export class SecretSharingController {
     return { secretShareId: secretShare.id };
   }
 
+  @Post(controller_path.SECRETSHARE.POST_NEW_SHARE_SECRET)
+  @Roles(UserRoles.ADMIN)
   @Post(controller_path.SECRETSHARE.POST_NEW_SHARE_SECRET)
   @Roles(UserRoles.ADMIN)
   @Render('secretShareConfirmation.hbs')

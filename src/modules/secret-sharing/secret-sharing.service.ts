@@ -45,7 +45,6 @@ export class SecretSharingService {
   ) {
     const accountGiver = await this.accountDAL.findAccount(accountGiverId);
 
-   
     const timeNow = new Date();
     const receiverUser = await this.usersDAL.findByEmail(
       createSecretSharingDto.receiverEmail,
@@ -104,7 +103,8 @@ export class SecretSharingService {
   async sendVerificationCode(secretShareId: number): Promise<any> {
     const verificationCode = generateSixDigitCode();
 
-    const secretShare = await this.secretsSharingDAL.findSecretShareById(secretShareId);
+    const secretShare =
+      await this.secretsSharingDAL.findSecretShareById(secretShareId);
 
     if (!secretShare) {
       throw new NotFoundException(
@@ -155,11 +155,11 @@ export class SecretSharingService {
   async acceptSecret(secretShareId: number, acceptSecretDto: AcceptSecretDto) {
     const secretShare =
       await this.secretsSharingDAL.findSecretShareById(secretShareId);
-      
+
     if (!secretShare) {
       throw new NotFoundException(errorMessage.NOT_FOUND('shared secret'));
     }
-   
+
     const timeNow = new Date();
     if (secretShare.expirationTime < timeNow) {
       throw new BadRequestException(errorMessage.INVALID_TIME);
@@ -169,7 +169,7 @@ export class SecretSharingService {
       secretShare.secretId,
       secretShare.accountGiverId,
     );
- 
+
     if (!secret) {
       throw new NotFoundException(errorMessage.NOT_FOUND('secret'));
     }
@@ -188,9 +188,7 @@ export class SecretSharingService {
 
     if (!isKeyValid || acceptSecretDto.code !== secretShare.passcode) {
       await this.secretsSharingDAL.decrementTries(secretShareId);
-      throw new BadRequestException(
-        errorMessage.NOT_FOUND,
-      );
+      throw new BadRequestException(errorMessage.NOT_FOUND);
     }
     if (secretShare.numberOfTries <= 0) {
       throw new BadRequestException(errorMessage.INVALID_ATTEMPT);
