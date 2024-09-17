@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
-import { ErrorDal } from 'src/common/dal/error.dal';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { ErrorDal } from '../../../common/dal/error.dal';
+import { PrismaService } from '../../../modules/prisma/prisma.service';
 
 @Injectable()
 export class MembershipDAL {

@@ -5,7 +5,7 @@ import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
 import { controller } from '../../constants/controller';
 import { controller_path } from '../../constants/controller-path';
 import { ConfigService } from '@nestjs/config';
-import { CreateSecretsDto } from '../secrets/dtos/createSecrets.dto';
+import { CreateSecretsDto } from '../secrets/dtos/create-secrets.dto';
 
 @Injectable()
 export class EmailService {
@@ -41,7 +41,7 @@ export class EmailService {
       dynamicTemplateData: {
         secretName: `${secret.name}`,
         description: `${secret.description}`,
-        url: `${process.env.HOST}/secret-sharing/accept-secret/${secretShareId}`,
+        url: `${process.env.HOST}/secret-sharing/${secretShareId}`,
       },
     };
     await this.sendGridClient.send(mail);

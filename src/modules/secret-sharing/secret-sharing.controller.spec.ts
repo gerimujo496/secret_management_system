@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SecretSharingController } from './secret-sharing.controller';
 import { SecretSharingService } from './secret-sharing.service';
 import { SecretSharingDAL } from './secret-sharing.dal'
+import { AccountDAL } from '../account/dal/account.dal';
 describe('SecretsController', () => {
   let controller: SecretSharingController;
   let service: SecretSharingService;
@@ -20,6 +21,7 @@ describe('SecretsController', () => {
            
           },
         },
+        
         {
             provide: SecretSharingDAL,
             useValue: {createSecret:jest.fn(),
@@ -31,6 +33,19 @@ describe('SecretsController', () => {
 
 
 
+            }
+          },
+          {
+            provide: AccountDAL,
+            useValue: {
+              findUserById:jest.fn(),
+              findMembership:jest.fn(),
+              findAllMembershipsForAccount:jest.fn(),
+              findAccoun:jest.fn(),
+              findUsersMembershipsByAccoun:jest.fn(),
+              createMembershipAndAccount:jest.fn(),
+              updateAccount:jest.fn(),
+              deleteMembershipsAndAccount:jest.fn(),
             }
           },
       ],

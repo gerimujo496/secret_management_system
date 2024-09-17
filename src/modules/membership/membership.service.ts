@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
 import { MembershipDAL } from './dal/membership.dal';
-import { errorMessage } from 'src/constants/error-messages';
+import { errorMessage } from '../../constants/error-messages';
 
 @Injectable()
 export class MembershipService {
