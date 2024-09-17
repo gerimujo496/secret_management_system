@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateSecretsDto } from './dtos/create-secrets.dto';
 import { UpdateSecretsDto } from './dtos/update-secrets.dto';
 import { ErrorDal } from '../../common/dal/error.dal';
-
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()

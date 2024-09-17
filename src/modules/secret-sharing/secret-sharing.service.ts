@@ -105,7 +105,6 @@ export class SecretSharingService {
 
     const secretShare =
       await this.secretsSharingDAL.findSecretShareById(secretShareId);
-
     if (!secretShare) {
       throw new NotFoundException(
         errorMessage.NOT_FOUND('secret sharing record'),
