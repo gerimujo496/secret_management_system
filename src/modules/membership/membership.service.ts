@@ -85,34 +85,26 @@ export class MembershipService {
       throw new BadRequestException(
         errorMessage.BOTH_REQUIRED('Account ID', 'User ID'),
       );
-
     const roleViewerRecord = await this.membershipDAL.findRoleRecord(
       UserRoles.VIEWER,
     );
-
     if (!roleViewerRecord) {
       throw new BadRequestException(errorMessage.INVALID_ROLE);
     }
-
     const user = await this.userDal.findByEmail(email);
-
     const admin = await this.userDal.findOneById(adminId);
-
     if (!user) {
-      this.inviteUnregisteredUser({
+      return this.inviteUnregisteredUser({
         accountId,
-        user,
         email,
         roleViewerRecordId: roleViewerRecord.id,
         admin,
       });
     }
-
     const existingMembership = await this.membershipDAL.findExisitingMembership(
       user.id,
       accountId,
     );
-
     if (existingMembership) {
       throw new BadRequestException(errorMessage.MEMBERSHIP_EXISTS);
     }
@@ -120,55 +112,44 @@ export class MembershipService {
       user.id,
       accountId,
     );
-
     if (existingInvitation) {
       throw new BadRequestException(errorMessage.INVITATION_EXISTS);
     }
-
     const { confirmationToken } =
       await this.authService.updateConfirmationTokenAndReturnNewUser(user);
-
     const newMembershipData = {
       accountId,
       userId: user.id,
       roleId: roleViewerRecord.id,
     };
-
     const newMembership =
       await this.membershipDAL.createMembership(newMembershipData);
-
     await this.emailService.sendInvitationForAccountMembership({
       sender: { firstName: admin.firstName, lastName: admin.lastName },
       recipient: user.email,
       membershipId: newMembership.id,
       confirmationToken,
     });
-
     return `Your invitation to ${user.email} was successfully sent.`;
   }
-
   async inviteUnregisteredUser({
     accountId,
     roleViewerRecordId,
     admin,
     email,
-    user,
   }) {
     const newMembershipData = {
       accountId,
       roleId: roleViewerRecordId,
     };
-
     const newMembership =
       await this.membershipDAL.createMembership(newMembershipData);
-
     await this.emailService.sendInvitationForAccountMembership({
       sender: { firstName: admin.firstName, lastName: admin.lastName },
       recipient: email,
       membershipId: newMembership.id,
     });
-
-    return `Your invitation to ${user.email} was successfully sent.`;
+    return `Your invitation to ${email} was successfully sent.`;
   }
 
   async registerAndCreate(email: string, membershipId: string) {

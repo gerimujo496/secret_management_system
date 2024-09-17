@@ -26,7 +26,6 @@ import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 @Controller(controller_path.MEMBERSHIP.PATH)
 @ApiTags(controller_path.MEMBERSHIP.PATH)
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @UseGuards(RolesGuard)
 export class MembershipController {
   constructor(private membershipService: MembershipService) {}
@@ -61,6 +60,7 @@ export class MembershipController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(controller_path.MEMBERSHIP.INVITE_USER)
   @Roles(UserRoles.ADMIN)
   inviteUser(
@@ -68,14 +68,14 @@ export class MembershipController {
     @Request() request: any,
     @Body() body: CreateInvitationDTO,
   ) {
-    const adminId = request.user?.id || 1;
     return this.membershipService.inviteUser(
       parseInt(accountId),
       body.email,
-      adminId,
+      request.user?.id,
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(controller_path.MEMBERSHIP.UPDATE_ROLE)
   @Roles(UserRoles.ADMIN)
   updateUserRole(
@@ -90,6 +90,7 @@ export class MembershipController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(controller_path.MEMBERSHIP.DELETE_MEMBERSHIP)
   @Roles(UserRoles.ADMIN)
   deleteMembership(
