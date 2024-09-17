@@ -67,24 +67,28 @@ export class MembershipDAL {
   }
 
   async findMembership(membershipId: number, accountId: number) {
-    const membership = await this.prisma.membership.findFirst({
-      where: {
-        id: membershipId,
-        isConfirmed: true,
-        deletedAt: null,
-        accountId,
-      },
-      select: {
-        id: true,
-        role: {
-          select: {
-            roleName: true,
+    try {
+      const membership = await this.prisma.membership.findFirst({
+        where: {
+          id: membershipId,
+          isConfirmed: true,
+          deletedAt: null,
+          accountId,
+        },
+        select: {
+          id: true,
+          role: {
+            select: {
+              roleName: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return membership;
+      return membership;
+    } catch (error) {
+      this.errorDAL.handleError(error);
+    }
   }
 
   async findNotAdminMembership(accountId: number, userId: number) {

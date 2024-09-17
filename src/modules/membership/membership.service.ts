@@ -168,7 +168,7 @@ export class MembershipService {
       membershipId: newMembership.id,
     });
 
-    return `Email to ${user.firstName} ${user.lastName} was sent.`;
+    return `Your invitation to ${user.email} was successfully sent.`;
   }
 
   async registerAndCreate(email: string, membershipId: string) {
@@ -229,9 +229,7 @@ export class MembershipService {
       await this.membershipDAL.findUnconfirmedInvitation(membershipId, user.id);
 
     if (!unconfirmedInvitation) {
-      throw new BadRequestException(
-        'Invitation not found or already confirmed.',
-      );
+      throw new BadRequestException(errorMessage.INVITATION_NOT_FOUND);
     }
 
     await this.membershipDAL.acceptInvitation(unconfirmedInvitation.id);
@@ -239,7 +237,7 @@ export class MembershipService {
     return {
       view: 'index',
       title: 'Invitation accepted.',
-      message: `Your membership invitatation to the account of Akeron Allkushi was successfully accepted.`,
+      message: `Your membership invitatation was successfully accepted.`,
     };
   }
 }
