@@ -6,11 +6,19 @@ import {
 } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
 import { MembershipDAL } from './dal/membership.dal';
-import { errorMessage } from 'src/constants/error-messages';
+import { errorMessage } from '../../constants/error-messages';
+import { EmailService } from '../email/email.service';
+import { AuthService } from '../user/auth.service';
+import { UserDal } from '../user/user.dal';
 
 @Injectable()
 export class MembershipService {
-  constructor(private membershipDAL: MembershipDAL) {}
+  constructor(
+    private membershipDAL: MembershipDAL,
+    private emailService: EmailService,
+    private authService: AuthService,
+    private userDal: UserDal,
+  ) {}
 
   async updateUserRole({ accountId, userId, role }: UpdateMembership) {
     if (!userId || !accountId)
@@ -72,124 +80,166 @@ export class MembershipService {
     return await this.membershipDAL.deleteMembership(membership.id);
   }
 
-  // async inviteUser(accountId: number, userId: number, adminId: number) {
-  //   if (!accountId || !userId) return null;
+  async inviteUser(accountId: number, email: string, adminId: number) {
+    if (!accountId)
+      throw new BadRequestException(
+        errorMessage.BOTH_REQUIRED('Account ID', 'User ID'),
+      );
 
-  //   const baseUrl = this.configService.get<string>('INVITATION_URL');
-  //   if (!baseUrl) {
-  //     throw new Error('Base URL for invitations is not configured.');
-  //   }
+    const roleViewerRecord = await this.membershipDAL.findRoleRecord(
+      UserRoles.VIEWER,
+    );
 
-  //   const adminID = adminId ? adminId : 2;
+    if (!roleViewerRecord) {
+      throw new BadRequestException(errorMessage.INVALID_ROLE);
+    }
 
-  //   const admin = await this.prisma.membership.findFirst({
-  //     where: {
-  //       userId: adminID,
-  //       accountId,
-  //       isConfirmed: true,
-  //       role: { roleName: UserRoles.ADMIN },
-  //     },
-  //     select: {
-  //       user: {
-  //         select: {
-  //           firstName: true,
-  //           lastName: true,
-  //         },
-  //       },
-  //     },
-  //   });
+    const user = await this.userDal.findByEmail(email);
 
-  //   if (!admin) {
-  //     throw new BadRequestException('Admin not found or not authorized.');
-  //   }
+    const admin = await this.userDal.findOneById(adminId);
 
-  //   const roleViewerRecord = await this.prisma.role.findFirst({
-  //     where: { roleName: UserRoles.VIEWER },
-  //   });
+    if (!user) {
+      this.inviteUnregisteredUser({
+        accountId,
+        user,
+        email,
+        roleViewerRecordId: roleViewerRecord.id,
+        admin,
+      });
+    }
 
-  //   if (!roleViewerRecord) {
-  //     throw new BadRequestException('Viewer role not found.');
-  //   }
+    const existingMembership = await this.membershipDAL.findExisitingMembership(
+      user.id,
+      accountId,
+    );
 
-  //   const user = await this.prisma.user.findFirst({
-  //     where: { id: userId, isConfirmed: true },
-  //   });
+    if (existingMembership) {
+      throw new BadRequestException(errorMessage.MEMBERSHIP_EXISTS);
+    }
+    const existingInvitation = await this.membershipDAL.findExistingInvitation(
+      user.id,
+      accountId,
+    );
 
-  //   if (!user) {
-  //     throw new NotFoundException('User not found.');
-  //   }
+    if (existingInvitation) {
+      throw new BadRequestException(errorMessage.INVITATION_EXISTS);
+    }
 
-  //   const existingMembership = await this.prisma.membership.findFirst({
-  //     where: { userId, accountId, isConfirmed: true, deletedAt: null },
-  //   });
+    const { confirmationToken } =
+      await this.authService.updateConfirmationTokenAndReturnNewUser(user);
 
-  //   if (existingMembership) {
-  //     throw new BadRequestException(
-  //       'User already has a membership for this account.',
-  //     );
-  //   }
+    const newMembershipData = {
+      accountId,
+      userId: user.id,
+      roleId: roleViewerRecord.id,
+    };
 
-  //   const existingInvitation = await this.prisma.membership.findFirst({
-  //     where: { userId, accountId, isConfirmed: null },
-  //   });
+    const newMembership =
+      await this.membershipDAL.createMembership(newMembershipData);
 
-  //   if (existingInvitation) {
-  //     throw new BadRequestException(
-  //       'User already has an invitation to your account.',
-  //     );
-  //   }
+    await this.emailService.sendInvitationForAccountMembership({
+      sender: { firstName: admin.firstName, lastName: admin.lastName },
+      recipient: user.email,
+      membershipId: newMembership.id,
+      confirmationToken,
+    });
 
-  //   const newMembershipData = {
-  //     accountId,
-  //     userId,
-  //     roleId: roleViewerRecord.id,
-  //   };
+    return `Your invitation to ${user.email} was successfully sent.`;
+  }
 
-  //   const newMembership = await this.prisma.membership.create({
-  //     data: newMembershipData,
-  //   });
+  async inviteUnregisteredUser({
+    accountId,
+    roleViewerRecordId,
+    admin,
+    email,
+    user,
+  }) {
+    const newMembershipData = {
+      accountId,
+      roleId: roleViewerRecordId,
+    };
 
-  //   const invitationUrl = `${baseUrl}?membershipId=${newMembership.id}`;
+    const newMembership =
+      await this.membershipDAL.createMembership(newMembershipData);
 
-  //   await this.emailService.sendInvitationForAccountMembership({
-  //     sender: admin.user,
-  //     recipient: user.email,
-  //     url: invitationUrl,
-  //   });
+    await this.emailService.sendInvitationForAccountMembership({
+      sender: { firstName: admin.firstName, lastName: admin.lastName },
+      recipient: email,
+      membershipId: newMembership.id,
+    });
 
-  //   return {
-  //     view: 'index',
-  //     data: {
-  //       title: 'Invitation accepted.',
-  //       message: `Your membership invitatation to the account of ${admin.user.firstName} ${admin.user.lastName} was successfully accepted.`,
-  //     },
-  //   };
-  // }
+    return `Email to ${user.firstName} ${user.lastName} was sent.`;
+  }
 
-  // async confirmInvitation(membershipId: number) {
-  //   try {
-  //     if (!membershipId) return null;
+  async registerAndCreate(email: string, membershipId: string) {
+    return {
+      view: 'signup',
+      email,
+      prefix: 'membership',
+      path: 'register/confirm',
+      membershipId,
+    };
+  }
 
-  //     const membership = await this.prisma.membership.findFirst({
-  //       where: { id: membershipId, isConfirmed: null },
-  //     });
+  async registerAndConfirmInvitation(body: any, membershipId: number) {
+    const confirmationToken = await this.authService.createUser(body);
 
-  //     if (!membership) {
-  //       throw new BadRequestException(
-  //         'Invitation not found or already confirmed.',
-  //       );
-  //     }
+    if (!confirmationToken) {
+      return {
+        view: 'index',
+        title: 'Your invitation was NOT accepted',
+        message: 'Something went wrong',
+        src: 'https://pngfre.com/wp-content/uploads/sad-emoji-png-image-from-pngfre-2-284x300.png',
+      };
+    }
 
-  //     await this.prisma.membership.update({
-  //       where: { id: membershipId },
-  //       data: { isConfirmed: true },
-  //     });
+    const user =
+      await this.authService.getUserFromTokenOrThrowErrorIfTokenIsNotValidOrUserDoNotExists(
+        confirmationToken,
+      );
 
-  //     return 'Membership invitation Confirmed';
-  //   } catch (error) {
-  //     throw new InternalServerErrorException(
-  //       'An error occurred while confirming the invitation.',
-  //     );
-  //   }
-  // }
+    const membership = await this.membershipDAL.updateMembership(
+      membershipId,
+      user.id,
+    );
+
+    return {
+      view: 'index',
+      title: 'Your invitation was accepted',
+      message: 'Welcome to the club.',
+    };
+  }
+
+  async updateTest(id: number, userId: number) {
+    return await this.membershipDAL.updateMembership(id, userId);
+  }
+
+  async confirmInvitation(membershipId: number, token: string) {
+    if (!membershipId || !token)
+      throw new BadRequestException(
+        errorMessage.BOTH_REQUIRED('Membership Id', 'Token'),
+      );
+
+    const user =
+      await this.authService.getUserFromTokenOrThrowErrorIfTokenIsNotValidOrUserDoNotExists(
+        token,
+      );
+
+    const unconfirmedInvitation =
+      await this.membershipDAL.findUnconfirmedInvitation(membershipId, user.id);
+
+    if (!unconfirmedInvitation) {
+      throw new BadRequestException(
+        'Invitation not found or already confirmed.',
+      );
+    }
+
+    await this.membershipDAL.acceptInvitation(unconfirmedInvitation.id);
+
+    return {
+      view: 'index',
+      title: 'Invitation accepted.',
+      message: `Your membership invitatation to the account of Akeron Allkushi was successfully accepted.`,
+    };
+  }
 }

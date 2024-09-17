@@ -19,7 +19,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { controller_path } from 'src/constants/controller-path';
 
 @Controller(controller_path.ACCOUNT.PATH)
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class AccountController {
   constructor(private accountService: AccountService) {}

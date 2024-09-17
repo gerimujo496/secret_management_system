@@ -25,5 +25,6 @@ import { PrismaModule } from '../prisma/prisma.module';
     PrismaModule,
     EmailModule,
   ],
+  exports: [AuthService, UserDal],
 })
 export class UserModule {}
