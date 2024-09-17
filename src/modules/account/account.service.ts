@@ -7,8 +7,8 @@ import { CreateAccountDto } from './dtos/create-account.dto';
 import { generate } from 'generate-password';
 import { UpdateAccountDto } from './dtos/update-account.dto';
 import { AccountDAL } from './dal/account.dal';
-import { validateNonEmptyObject } from 'src/common/util/validator';
-import { errorMessage } from 'src/constants/error-messages';
+import { validateNonEmptyObject } from '../../common/util/validator';
+import { errorMessage } from '../../constants/error-messages';
 
 @Injectable()
 export class AccountService {

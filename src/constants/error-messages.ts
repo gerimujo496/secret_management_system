@@ -35,6 +35,8 @@ export const errorMessage = {
 
   REQUIRED_ROLE: 'You do not have the required roles',
 
+  INVALID_TIME: 'Invalid time',
+  INVALID_ATTEMPT: 'You have used all your attempts',
   MEMBERSHIP_EXISTS: 'User already has a membership for this account.',
 
   INVITATION_EXISTS: 'User already has a invitation for this account.',

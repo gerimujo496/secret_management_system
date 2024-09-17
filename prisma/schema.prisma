@@ -94,20 +94,17 @@ model Secret {
 
   @@map("Secrets")
 }
-
 model AccountSecret {
-  id        Int       @id @default(autoincrement())
-  accountId Int       @map("account_id")
-  secretId  Int       @map("secret_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-  accounts  Account   @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  secret    Secret    @relation(fields: [secretId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
+  id        Int     @id @default(autoincrement())
+  accountId Int     @map("account_id")
+  secretId  Int     @map("secret_id")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @default(now()) @updatedAt @map("updated_at")
+  deletedAt     DateTime?       @map("deleted_at")
+  accounts  Account @relation(fields: [accountId], references: [id],onDelete: Cascade, onUpdate: Cascade)
+  secret    Secret  @relation(fields: [secretId], references: [id],onDelete: Cascade, onUpdate: Cascade)
   @@map("Account_secrets")
 }
-
 model SecretShare {
   id                Int      @id @default(autoincrement())
   expirationTime    DateTime @map("expiration_time")
@@ -120,7 +117,6 @@ model SecretShare {
   accountGiver      Account  @relation("accountGiver", fields: [accountGiverId], references: [id])
   accountReceiver   Account  @relation("accountReciver", fields: [accountReceiverId], references: [id])
   secret            Secret   @relation(fields: [secretId], references: [id])
-
   @@map("Secrets_share")
 }
 
