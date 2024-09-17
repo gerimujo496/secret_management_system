@@ -24,4 +24,12 @@ export const controller_path = {
     REGISTER_AND_CONFIRM: 'register/confirm',
     INVITE_USER: ':accountId',
   },
+  SECRET:{
+    PATH:'secret',
+    CREATE_SECRET:':accountId/secrets',
+    GET_ONE: ':accountId/:secretId',
+    GET_SECRETS: ':accountId/secrets',
+    UPDATE_SECRETS: ':accountId/:secretId',
+    DELETE_SECRET: ':accountId/:secretId'
+  }
 };

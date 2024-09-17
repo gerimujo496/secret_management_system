@@ -29,7 +29,7 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const userId = request.user?.id || 1;
+    const userId = request.user?.id;
 
     if (!userId) {
       throw new ForbiddenException(errorMessage.FORBIDDEN_ACCESS);
@@ -37,9 +37,9 @@ export class RolesGuard implements CanActivate {
 
     const accountId = request.params.accountId;
 
-    // if (!userId || !accountId) {
-    //   throw new ForbiddenException('Forbidden resource.');
-    // }
+    if (!userId || !accountId) {
+      throw new ForbiddenException('Forbidden resource.');
+    }
 
     const memberships = await this.prisma.membership.findMany({
       where: {
