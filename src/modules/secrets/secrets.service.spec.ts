@@ -1,15 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SecretsService } from './secrets.service';
 import { SecretsDAL } from './secrets.dal';
-import { AccountDAL } from '../account/account.dal';
-import { CreateSecretsDto } from './dtos/createSecrets.dto';
+import { AccountDAL } from '../account/dal/account.dal';
+import { CreateSecretsDto } from './dtos/create-secrets.dto';
 import * as encryptUtils from '../../common/utils/encrypt';
 import {
   BadRequestException,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
+import { UpdateSecretsDto } from './dtos/update-secrets.dto';
 
 jest.mock('../../common/utils/encrypt', () => ({
   encrypt: jest.fn(),
@@ -35,7 +34,7 @@ describe('SecretsService', () => {
             deleteSecret: jest.fn(),
           },
         },
-        { provide: AccountDAL, useValue: { findAccountById: jest.fn() } },
+        { provide: AccountDAL, useValue: { findAccount: jest.fn() } },
       ],
     }).compile();
 
@@ -78,13 +77,13 @@ describe('SecretsService', () => {
   const decryptedValue = 'decryptedValue';
   describe('createSecret', () => {
     it('should create a secret successfully', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(account);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(account);
       jest.spyOn(secretsDAL, 'createSecret').mockResolvedValue(createdSecret);
       jest.spyOn(encryptUtils, 'encrypt').mockReturnValue('encryptedValue');
 
       const result = await service.createSecret(createSecretDto, account.id);
 
-      expect(accountDAL.findAccountById).toHaveBeenCalledWith(account.id);
+      expect(accountDAL.findAccount).toHaveBeenCalledWith(account.id);
       expect(encryptUtils.encrypt).toHaveBeenCalledWith(
         createSecretDto.value,
         account.password,
@@ -96,14 +95,14 @@ describe('SecretsService', () => {
       expect(result).toEqual(createdSecret);
     });
     it('should throw a NotFoundException when account is not found', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(null);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(null);
 
       await expect(
         service.createSecret({} as CreateSecretsDto, 1),
       ).rejects.toThrow(NotFoundException);
     });
     it('should throw a BadRequestException on secret creation failure', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(account);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(account);
       jest.spyOn(secretsDAL, 'createSecret').mockResolvedValue(null);
 
       await expect(
@@ -124,7 +123,7 @@ describe('SecretsService', () => {
       },
     ];
     it('should return decrypted secrets for an account', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(account);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(account);
       jest.spyOn(secretsDAL, 'findAllSecrets').mockResolvedValue(secrets);
       jest.spyOn(encryptUtils, 'decrypt').mockReturnValue(decryptedValue);
 
@@ -138,7 +137,7 @@ describe('SecretsService', () => {
       expect(result).toEqual([{ ...secrets[0], value: decryptedValue }]);
     });
     it('should throw a NotFoundException when account is not found', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(null);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(null);
 
       await expect(
         service.createSecret({} as CreateSecretsDto, 1),
@@ -154,7 +153,7 @@ describe('SecretsService', () => {
   });
   describe('findSecretByIdAndAccount', () => {
     it('should get a descypered secret for an account by its id', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(account);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(account);
       jest.spyOn(secretsDAL, 'findSecretById').mockResolvedValue(secret);
       jest.spyOn(encryptUtils, 'decrypt').mockReturnValue(decryptedValue);
 
@@ -180,7 +179,7 @@ describe('SecretsService', () => {
       const encryptedValue = 'encryptedNewValue';
 
       jest.spyOn(service, 'findSecretByIdAndAccount').mockResolvedValue(secret);
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(account);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(account);
       jest.spyOn(encryptUtils, 'encrypt').mockReturnValue(encryptedValue);
       jest
         .spyOn(secretsDAL, 'updateSecret')
@@ -205,7 +204,7 @@ describe('SecretsService', () => {
     });
 
     it('should throw a NotFoundException when account is not found', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(null);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(null);
 
       await expect(
         service.createSecret({} as CreateSecretsDto, 1),
@@ -230,7 +229,7 @@ describe('SecretsService', () => {
       expect(result).toEqual(secret);
     });
     it('should throw a NotFoundException when account is not found', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(null);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(null);
 
       await expect(
         service.createSecret({} as CreateSecretsDto, 1),

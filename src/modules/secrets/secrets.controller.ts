@@ -11,13 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { SecretsService } from './secrets.service';
-import { CreateSecretsDto } from './dtos/createSecrets.dto';
+import { CreateSecretsDto } from './dtos/create-secrets.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { UpdateSecretsDto } from './dtos/update-secrets.dto';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
-import { controller_path } from 'src/constants/controller-path';
+import { controller_path } from '../../constants/controller-path';
 
 @ApiTags('secrets')
 @Controller('secrets')
@@ -74,4 +74,3 @@ export class SecretsController {
     return this.secretsService.deleteSecret(accountId, secretId);
   }
 }
-

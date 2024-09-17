@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { SecretsDAL } from './secrets.dal';
 import { AccountDAL } from '../account/dal/account.dal';
-import { CreateSecretsDto } from './dtos/createSecrets.dto';
-import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
+import { CreateSecretsDto } from './dtos/create-secrets.dto';
+import { UpdateSecretsDto } from './dtos/update-secrets.dto';
 import { encrypt, decrypt } from '../../common/utils/encrypt';
-import { errorMessage } from 'src/constants/error-messages';
+import { errorMessage } from '../../constants/error-messages';
 @Injectable()
 export class SecretsService {
   constructor(
@@ -28,7 +28,9 @@ export class SecretsService {
       accountId,
     );
     if (!createdSecret) {
-      throw new BadRequestException(errorMessage.INTERNAL_SERVER_ERROR('create','secret'));
+      throw new BadRequestException(
+        errorMessage.INTERNAL_SERVER_ERROR('create', 'secret'),
+      );
     }
     return createdSecret;
   }
@@ -51,9 +53,7 @@ export class SecretsService {
   async findSecretByIdAndAccount(accountId: number, secretId: number) {
     const secret = await this.secretsDAL.findSecretById(secretId, accountId);
     if (!secret) {
-      throw new NotFoundException(
-        errorMessage.NOT_FOUND('secret'),
-      );
+      throw new NotFoundException(errorMessage.NOT_FOUND('secret'));
     }
     const account = await this.accountsDAL.findAccount(accountId);
     if (!account) {

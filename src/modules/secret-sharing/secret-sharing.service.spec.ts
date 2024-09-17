@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SecretSharingService } from './secret-sharing.service';
-import { AccountDAL } from '../account/account.dal';
+import { AccountDAL } from '../account/dal/account.dal';
 import { SecretsDAL } from '../secrets/secrets.dal';
 import { SecretSharingDAL } from './secret-sharing.dal';
 import { EmailService } from '../email/email.service';
@@ -21,9 +21,9 @@ describe('SecretSharingService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SecretSharingService,
-        { provide: AccountDAL, useValue: { findAccountById: jest.fn() } },
+        { provide: AccountDAL, useValue: { findAccount: jest.fn() } },
         { provide: SecretsDAL, useValue: { findSecretById: jest.fn() } },
-        { provide: SecretSharingDAL, useValue: { createSecret: jest.fn(), findSecretShareById: jest.fn(), updateSecretSharing: jest.fn() } },
+        { provide: SecretSharingDAL, useValue: { createSecretShare: jest.fn(), findSecretShareById: jest.fn(), updateSecretSharing: jest.fn() } },
         { provide: EmailService, useValue: { sendVerificationCodeEmail: jest.fn(), secretSharingEmail: jest.fn() } },
         { provide: UserDal, useValue: { findByEmail: jest.fn() } },
         { provide: MembershipDAL, useValue: { findMembershipByUserId: jest.fn() } },
@@ -51,13 +51,13 @@ describe('SecretSharingService', () => {
   const expirationTime = new Date(expirationTimeString);
   describe('genereateKey', () => {
     it('should throw NotFoundException if account does not exist', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(null);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(null);
 
       await expect(service.genereateKey(1)).rejects.toThrow(NotFoundException);
     });
 
     it('should return a generated key if account exists', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(account);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(account);
       jest.spyOn(service, 'genereateKey').mockResolvedValue('mockGeneratedKey');
 
       const result = await service.genereateKey(1);
@@ -80,7 +80,7 @@ describe('SecretSharingService', () => {
     });
 
     it('should throw NotFoundException if secret is not found', async () => {
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(account);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(account);
       jest.spyOn(usersDAL, 'findByEmail').mockResolvedValue({id: 1,
         firstName: 'John',
         lastName: 'Doe',
@@ -106,7 +106,7 @@ describe('SecretSharingService', () => {
 
     it('should share the secret successfully', async () => {
       const secret = { id: 1, name: 'Test Secret',value: 'secret value', description:'test description',createdAt:new Date() , updatedAt: new Date(), deletedAt: null};
-      jest.spyOn(accountDAL, 'findAccountById').mockResolvedValue(account);
+      jest.spyOn(accountDAL, 'findAccount').mockResolvedValue(account);
       jest.spyOn(usersDAL, 'findByEmail').mockResolvedValue({ id: 1,
         firstName: 'John',
         lastName: 'Doe',

@@ -14,7 +14,7 @@ import { UserDal } from '../user/user.dal';
 import { MembershipDAL } from '../membership/membership.dal';
 import { AcceptSecretDto } from './dtos/accept-secret.dto';
 import { generateSixDigitCode } from '../../common/utils/secret-sharing';
-import { errorMessage } from 'src/constants/error-messages';
+import { errorMessage } from '../../constants/error-messages';
 @Injectable()
 export class SecretSharingService {
   constructor(
