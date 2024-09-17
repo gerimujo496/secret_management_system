@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Confirmed</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+      .email-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .email-header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .email-body {
+        font-size: 16px;
+        color: #333333;
+        text-align: center;
+      }
+      .email-footer {
+        margin-top: 30px;
+        font-size: 12px;
+        text-align: center;
+        color: #888888;
+      }
+      .icon {
+        width: 400px;
+        height: 400px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <img
+         src="{{#if src}}{{src}}{{else}}https://www.shutterstock.com/image-vector/check-mark-icon-symbols-vector-600nw-1906113508.jpg{{/if}}"
+          alt="Check Icon"
+          class="icon"
+          
+        />
+        <h2>{{title}}</h2>
+      </div>
+      <div class="email-body">
+       
+        <p>
+        {{message}}
+        </p>
+        <p>If you have any questions, feel free to contact our support team.</p>
+      </div>
+      <div class="email-footer">
+        <p>© 2024 Our App. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
