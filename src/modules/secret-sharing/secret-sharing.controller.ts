@@ -20,8 +20,8 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
 import { controller_path } from '../../constants/controller-path';
 
-@ApiTags('secret-sharing')
-@Controller('secret-sharing')
+@ApiTags(controller_path.SECRETSHARE.PATH)
+@Controller(controller_path.SECRETSHARE.PATH)
  @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class SecretSharingController {
