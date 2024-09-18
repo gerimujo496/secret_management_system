@@ -1,34 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from './dto/user.dto';
+import { controller } from '../../constants/controller';
+import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
+import { User } from '../../common/customDecorators/user.decorator';
+import { UserDal } from './user.dal';
+import { SerializerInterceptor } from '../../common/interceptors/serialize.interceptors';
 
-@Controller('user')
+@Controller(controller.USER)
+@ApiBearerAuth()
+@ApiTags(controller.USER)
+@UseGuards(JwtAuthGuard)
+@UseInterceptors(new SerializerInterceptor(UserDto))
 export class UserController {
-  constructor(private readonly userService: UserService) {}
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
+  constructor(
+    private readonly userService: UserService,
+    private userDal: UserDal,
+  ) {}
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll() {
+    return await this.userDal.getAllUsers();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.userService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Patch()
+  async update(
+    @User() user: CreateUserDto,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return await this.userService.update(user.id, updateUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Delete()
+  async remove(@User() user: CreateUserDto) {
+    return await this.userService.remove(user.id);
   }
 }

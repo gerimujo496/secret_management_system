@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, MaxLength, MinLength, Matches } from 'class-validator';
-import { IsMatching } from '../../../common/customDecotators/is-matching.decorator';
+import { IsMatching } from '../../../common/customDecorators/is-matching.decorator';
 
 export class ResetPasswordDto {
   @ApiProperty()

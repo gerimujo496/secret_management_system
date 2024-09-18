@@ -38,7 +38,6 @@ export class SecretSharingService {
     }
     return KeyValue;
   }
-
   async shareSecret(
     createSecretSharingDto: CreateSecretSharingDto,
     accountGiverId: number,

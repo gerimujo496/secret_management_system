@@ -19,6 +19,15 @@ export const errorMessage = {
 
   EMAIL_IS_NOT_CONFIRMED: 'Email is not confirmed',
 
+  USER_2FA_IS_ENABLED:
+    'Two factor authentication is enabled, please login through the 2fa endpoint and provide the code',
+
+  USER_2FA_NOT_ENABLED:
+    'Two factor authentication is not enabled, please login through the login endpoint ',
+
+  WRONG_AUTH_CODE: 'Wrong authentication code',
+
+  CAN_NOT_SEND_EMAIL: 'Can not send email',
   ID_REQUIRED: (id: string) => `${id} is required.`,
 
   BOTH_REQUIRED: (id1: string, id2: string) =>

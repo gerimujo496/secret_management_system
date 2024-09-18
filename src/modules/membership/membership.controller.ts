@@ -11,18 +11,20 @@ import {
   Request,
   Render,
 } from '@nestjs/common';
+import { UserRoles } from '@prisma/client';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 import { UpdateRoleDto } from './dtos/update-role.dto';
 import { MembershipService } from './membership.service';
-import { AuthGuard } from '../../common/guards/auth.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { UserRoles } from '@prisma/client';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { controller_path } from '../../constants/controller-path';
-import { CreateUserDto } from '../user/dto/create-user.dto';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { CreateInvitationDTO } from './dtos/create-invitation.dto';
+import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 
 @Controller(controller_path.MEMBERSHIP.PATH)
-@UseGuards(AuthGuard)
+@ApiTags(controller_path.MEMBERSHIP.PATH)
 @UseGuards(RolesGuard)
 export class MembershipController {
   constructor(private membershipService: MembershipService) {}
@@ -56,7 +58,8 @@ export class MembershipController {
       query.token,
     );
   }
-
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post(controller_path.MEMBERSHIP.INVITE_USER)
   @Roles(UserRoles.ADMIN)
   inviteUser(
@@ -64,14 +67,15 @@ export class MembershipController {
     @Request() request: any,
     @Body() body: CreateInvitationDTO,
   ) {
-    const adminId = request.user?.id || 1;
     return this.membershipService.inviteUser(
       parseInt(accountId),
       body.email,
-      adminId,
+      request.user?.id,
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch(controller_path.MEMBERSHIP.UPDATE_ROLE)
   @Roles(UserRoles.ADMIN)
   updateUserRole(
@@ -86,6 +90,8 @@ export class MembershipController {
     });
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Delete(controller_path.MEMBERSHIP.DELETE_MEMBERSHIP)
   @Roles(UserRoles.ADMIN)
   deleteMembership(

@@ -12,9 +12,7 @@ export class ErrorDal {
     if (error instanceof PrismaClientKnownRequestError) {
       this.handlePrismaError(error);
     } else {
-      throw new InternalServerErrorException(
-        'An error occurred while processing your request.',
-      );
+      throw new InternalServerErrorException(error.message);
     }
   }
 

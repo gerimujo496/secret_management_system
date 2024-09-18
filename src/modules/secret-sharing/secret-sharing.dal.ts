@@ -1,6 +1,6 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSecretSharingDto } from './dtos/create-secret-sharing.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SecretShare } from '@prisma/client';
 import { ErrorDal } from '../../common/dal/error.dal';
 @Injectable()

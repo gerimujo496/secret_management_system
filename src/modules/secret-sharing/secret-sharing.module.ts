@@ -10,8 +10,10 @@ import { SendgridClient } from '../email/sendgrid-client';
 import { UserDal } from '../user/user.dal';
 import { MembershipDAL } from '../membership/dal/membership.dal';
 import { ErrorDal } from '../../common/dal/error.dal';
+import { PassportModule } from '../passport/passport.module';
 
 @Module({
+  imports: [PassportModule],
   providers: [
     SecretSharingService,
     AccountDAL,
