@@ -33,8 +33,16 @@ export class AccountService {
     const [account, membership] =
       await this.accountDAL.createMembershipAndAccount(data, userId, password);
 
-    console.log(userId, 'HERE');
     return { account, membership };
+  }
+
+  async getAccounts(userId: number) {
+    if (!userId)
+      throw new BadRequestException(errorMessage.ID_REQUIRED('User ID'));
+
+    const myAccounts = await this.accountDAL.findMyAccounts(userId);
+
+    return myAccounts;
   }
 
   async getMyAccount(userId: number, accountId: number) {

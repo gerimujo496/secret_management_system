@@ -14,18 +14,22 @@ import { CreateAccountDto } from './dtos/create-account.dto';
 import { UpdateAccountDto } from './dtos/update-account.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
-import { RolesGuard } from '../../common/guards/roles.guard';
 import { controller_path } from '../../constants/controller-path';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 
-@Controller(controller_path.ACCOUNT.PATH)
 @ApiBearerAuth()
-@ApiTags(controller_path.ACCOUNT.PATH)
 @UseGuards(JwtAuthGuard)
-@UseGuards(RolesGuard)
+@Controller(controller_path.ACCOUNT.PATH)
+@ApiTags(controller_path.ACCOUNT.PATH)
 export class AccountController {
   constructor(private accountService: AccountService) {}
+
+  @Get(controller_path.ACCOUNT.MY_ACCOUNTS)
+  @Roles(UserRoles.ADMIN, UserRoles.EDITOR, UserRoles.VIEWER)
+  getAccounts(@Request() req: any) {
+    return this.accountService.getAccounts(req.user?.id);
+  }
 
   @Post()
   createAccount(@Body() body: CreateAccountDto, @Request() req: any) {

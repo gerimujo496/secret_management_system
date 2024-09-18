@@ -20,6 +20,37 @@ export class MembershipDAL {
     }
   }
 
+  async findAccountMemberships(accountId: number) {
+    try {
+      const memberships = await this.prisma.membership.findMany({
+        where: { deletedAt: null, accountId, isConfirmed: true },
+        select: {
+          user: { select: { firstName: true, lastName: true, id: true } },
+          id: true,
+          accountId: true,
+          createdAt: true,
+          updatedAt: true,
+          role: { select: { roleName: true } },
+        },
+      });
+
+      const membershipsList = memberships.map((membership) => ({
+        id: membership.id,
+        userId: membership.user.id,
+        firstName: membership.user.firstName,
+        lastName: membership.user.lastName,
+        role: membership.role.roleName,
+        accountId: membership.accountId,
+        createdAt: membership.createdAt,
+        updatedAt: membership.updatedAt,
+      }));
+
+      return { membershipsList };
+    } catch (error) {
+      this.errorDAL.handleError(error);
+    }
+  }
+
   async findExisitingMembership(userId: number, accountId: number) {
     try {
       return await this.prisma.membership.findFirst({
@@ -192,9 +223,13 @@ export class MembershipDAL {
   }
   async findMembershipByUserId(userId: number) {
     try {
+      const role = await this.prisma.role.findFirst({
+        where: { roleName: 'ADMIN' },
+      });
       return await this.prisma.membership.findFirst({
         where: {
           userId: userId,
+          roleId: role.id,
           deletedAt: null,
         },
         include: {

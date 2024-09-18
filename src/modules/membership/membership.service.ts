@@ -20,6 +20,13 @@ export class MembershipService {
     private userDal: UserDal,
   ) {}
 
+  async getAccountMemberships(accountId: number) {
+    if (!accountId)
+      throw new BadRequestException(errorMessage.ID_REQUIRED('Account ID'));
+
+    return await this.membershipDAL.findAccountMemberships(accountId);
+  }
+
   async updateUserRole({ accountId, userId, role }: UpdateMembership) {
     if (!userId || !accountId)
       throw new BadRequestException(

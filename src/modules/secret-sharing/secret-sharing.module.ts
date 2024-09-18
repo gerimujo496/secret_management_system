@@ -11,9 +11,10 @@ import { UserDal } from '../user/user.dal';
 import { MembershipDAL } from '../membership/dal/membership.dal';
 import { ErrorDal } from '../../common/dal/error.dal';
 import { PassportModule } from '../passport/passport.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [PassportModule],
+  imports: [PassportModule, AuthModule],
   providers: [
     SecretSharingService,
     AccountDAL,
