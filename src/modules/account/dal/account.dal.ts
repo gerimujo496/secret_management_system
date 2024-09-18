@@ -63,6 +63,33 @@ export class AccountDAL {
     }
   }
 
+  async findMyAccounts(userId: number) {
+    try {
+      const myAccounts = await this.prisma.membership.findMany({
+        where: {
+          userId: userId,
+          isConfirmed: true,
+          deletedAt: null,
+        },
+        select: {
+          account: {
+            select: { name: true, id: true, description: true },
+          },
+          role: { select: { roleName: true } },
+        },
+      });
+
+      const accountsList = myAccounts.map((membership) => ({
+        ...membership.account,
+        role: membership.role.roleName,
+      }));
+
+      return { accountsList };
+    } catch (error) {
+      this.errorDAL.handleError(error);
+    }
+  }
+
   async findUsersMembershipsByAccount(accountId: number) {
     try {
       const memberships = await this.prisma.membership.findMany({

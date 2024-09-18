@@ -18,6 +18,7 @@ export const controller_path = {
     GET_USERS: ':accountId/users',
     UPDATE_ACCOUNT: ':accountId',
     DELETE_ACCOUNT: ':accountId',
+    MY_ACCOUNTS: 'myaccounts',
   },
   MEMBERSHIP: {
     PATH: 'membership',
@@ -26,6 +27,7 @@ export const controller_path = {
     CONFIRM: 'confirm',
     REGISTER_AND_CONFIRM: 'register/confirm',
     INVITE_USER: ':accountId',
+    ACCOUNT_MEMBERSHIPS: ':accountId/memberships',
   },
   SECRET: {
     PATH: 'secret',
