@@ -99,9 +99,8 @@ export class MembershipService {
     const admin = await this.userDal.findOneById(adminId);
 
     if (!user) {
-      this.inviteUnregisteredUser({
+      return this.inviteUnregisteredUser({
         accountId,
-        user,
         email,
         roleViewerRecordId: roleViewerRecord.id,
         admin,
@@ -152,7 +151,6 @@ export class MembershipService {
     roleViewerRecordId,
     admin,
     email,
-    user,
   }) {
     const newMembershipData = {
       accountId,
@@ -168,7 +166,7 @@ export class MembershipService {
       membershipId: newMembership.id,
     });
 
-    return `Your invitation to ${user.email} was successfully sent.`;
+    return `Your invitation to ${email} was successfully sent.`;
   }
 
   async registerAndCreate(email: string, membershipId: string) {

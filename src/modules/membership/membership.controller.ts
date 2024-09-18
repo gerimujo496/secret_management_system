@@ -22,7 +22,6 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateInvitationDTO } from './dtos/create-invitation.dto';
 
 @Controller(controller_path.MEMBERSHIP.PATH)
-@UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 export class MembershipController {
   constructor(private membershipService: MembershipService) {}
@@ -57,6 +56,7 @@ export class MembershipController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Post(controller_path.MEMBERSHIP.INVITE_USER)
   @Roles(UserRoles.ADMIN)
   inviteUser(
@@ -72,6 +72,7 @@ export class MembershipController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Patch(controller_path.MEMBERSHIP.UPDATE_ROLE)
   @Roles(UserRoles.ADMIN)
   updateUserRole(
@@ -86,6 +87,7 @@ export class MembershipController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Delete(controller_path.MEMBERSHIP.DELETE_MEMBERSHIP)
   @Roles(UserRoles.ADMIN)
   deleteMembership(
