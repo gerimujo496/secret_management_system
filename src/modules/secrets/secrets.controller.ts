@@ -13,7 +13,6 @@ import { SecretsService } from './secrets.service';
 import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
-import { AuthGuard } from '../../common/guards/auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
