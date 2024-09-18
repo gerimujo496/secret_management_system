@@ -41,12 +41,13 @@ export class SecretSharingController {
   @Post(controller_path.SECRETSHARE.CREATE_SHARE_SECRET)
   @Roles(UserRoles.ADMIN)
   async shareSecret(
-    @Param('accountId', ParseIntPipe) accountGiverId: number,
+    @Param('accountId', ParseIntPipe) accountId: number,
     @Body() createSecretSharingDto: CreateSecretSharingDto,
   ) {
+    console.log('calling')
     return this.secretsSharingService.shareSecret(
       createSecretSharingDto,
-      accountGiverId,
+      accountId,
     );
   }
 

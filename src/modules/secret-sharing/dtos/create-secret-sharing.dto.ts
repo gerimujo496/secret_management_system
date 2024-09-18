@@ -17,6 +17,7 @@ export class CreateSecretSharingDto {
     required: true,
   })
   expirationTime: Date;
+
   @IsString()
   @IsEmail()
   @IsNotEmpty()
@@ -25,6 +26,7 @@ export class CreateSecretSharingDto {
     required: true,
   })
   receiverEmail: string;
+
   @IsNumber()
   @IsNotEmpty()
   @Max(2)
@@ -33,6 +35,7 @@ export class CreateSecretSharingDto {
     required: true,
   })
   numberOfTries: number;
+  
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({

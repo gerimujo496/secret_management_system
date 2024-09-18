@@ -9,44 +9,27 @@ export class SecretSharingDAL {
     private readonly prisma: PrismaService,
     private errorDAL: ErrorDal,
   ) {}
-
   async createSecretShare(
     createSecretSharingDto: CreateSecretSharingDto,
     accountGiverId: number,
   ) {
+    const roles = await this.prisma.role.findFirst({
+      where: { roleName: 'ADMIN' },
+    });
     try {
-      const receiverAccount = await this.prisma.user.findFirst({
+      const user = await this.prisma.user.findFirst({
         where: {
           email: createSecretSharingDto.receiverEmail,
         },
       });
-      try {
-        const receiverAccount = await this.prisma.user.findFirst({
-          where: {
-            email: createSecretSharingDto.receiverEmail,
-          },
-        });
 
-        return await this.prisma.secretShare.create({
-          data: {
-            expirationTime: createSecretSharingDto.expirationTime,
-            numberOfTries: createSecretSharingDto.numberOfTries,
-            passcode: null,
-            isAccepted: false,
-            secret: {
-              connect: { id: createSecretSharingDto.secretId },
-            },
-            accountReceiver: {
-              connect: { id: receiverAccount.id },
-            },
-            accountGiver: {
-              connect: { id: accountGiverId },
-            },
-          },
-        });
-      } catch (error) {
-        this.errorDAL.handleError(error);
-      }
+      const userAccount = await this.prisma.membership.findFirst({
+        where: {
+          userId: user.id,
+          roleId: roles.id,
+        },
+      });
+
       return await this.prisma.secretShare.create({
         data: {
           expirationTime: createSecretSharingDto.expirationTime,
@@ -57,7 +40,7 @@ export class SecretSharingDAL {
             connect: { id: createSecretSharingDto.secretId },
           },
           accountReceiver: {
-            connect: { id: receiverAccount.id },
+            connect: { id: userAccount.accountId },
           },
           accountGiver: {
             connect: { id: accountGiverId },
@@ -65,6 +48,7 @@ export class SecretSharingDAL {
         },
       });
     } catch (error) {
+      console.log(error);
       this.errorDAL.handleError(error);
     }
   }
@@ -88,14 +72,7 @@ export class SecretSharingDAL {
         data: { numberOfTries: { decrement: 1 } },
       });
     } catch (error) {
-      this.errorDAL.handleError(error);
-    }
-    try {
-      return this.prisma.secretShare.update({
-        where: { id: secretShareId },
-        data: { numberOfTries: { decrement: 1 } },
-      });
-    } catch (error) {
+      console.log(error);
       this.errorDAL.handleError(error);
     }
   }
