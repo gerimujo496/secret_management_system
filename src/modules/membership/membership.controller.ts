@@ -17,7 +17,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateRoleDto } from './dtos/update-role.dto';
 import { MembershipService } from './membership.service';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { RolesGuard } from '../../common/guards/roles.guard';
 import { controller_path } from '../../constants/controller-path';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { CreateInvitationDTO } from './dtos/create-invitation.dto';
@@ -25,7 +24,6 @@ import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 
 @Controller(controller_path.MEMBERSHIP.PATH)
 @ApiTags(controller_path.MEMBERSHIP.PATH)
-@UseGuards(RolesGuard)
 export class MembershipController {
   constructor(private membershipService: MembershipService) {}
 
@@ -58,6 +56,15 @@ export class MembershipController {
       query.token,
     );
   }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get(controller_path.MEMBERSHIP.ACCOUNT_MEMBERSHIPS)
+  @Roles(UserRoles.ADMIN)
+  getAccountMemberships(@Param('accountId') accountId: string) {
+    return this.membershipService.getAccountMemberships(parseInt(accountId));
+  }
+
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post(controller_path.MEMBERSHIP.INVITE_USER)

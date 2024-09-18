@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { EmailModule } from '../email/email.module';
 import { PassportModule } from '../passport/passport.module';
 import { UserModule } from '../user/user.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   controllers: [AuthController],
@@ -22,6 +23,7 @@ import { UserModule } from '../user/user.module';
     forwardRef(() => EmailModule),
     forwardRef(() => UserModule),
     forwardRef(() => PassportModule),
+    forwardRef(() => PrismaModule),
   ],
   exports: [AuthService],
 })
