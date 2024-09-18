@@ -51,7 +51,6 @@ export class SecretSharingController {
   }
 
   @Get(controller_path.SECRETSHARE.GET_SHARE_SECRET_FORM)
-  @Roles(UserRoles.ADMIN)
   @Render('share-secretKey.hbs')
   async getSecretSharePage(
     @Param('secretShareId', ParseIntPipe) secretShareId: number,
@@ -67,7 +66,6 @@ export class SecretSharingController {
   }
 
   @Post(controller_path.SECRETSHARE.POST_NEW_SHARE_SECRET)
-  @Roles(UserRoles.ADMIN)
   @Render('secretShareConfirmation.hbs')
   async acceptSecret(
     @Param('secretShareId', ParseIntPipe) secretShareId: number,

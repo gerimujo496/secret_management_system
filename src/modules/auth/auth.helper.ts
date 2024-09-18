@@ -13,7 +13,6 @@ import { EmailService } from '../email/email.service';
 import { UserDal } from '../user/user.dal';
 import { CreateUserDto } from './dto/create-user.dto';
 import { errorMessage } from '../../constants/error-messages';
-import { JsonValue } from '@prisma/client/runtime/library';
 
 const scrypt = promisify(_scrypt);
 
