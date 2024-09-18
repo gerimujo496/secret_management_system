@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
-import { ErrorDal } from 'src/common/dal/error.dal';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { ErrorDal } from '../../../common/dal/error.dal';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class MembershipDAL {
@@ -185,6 +185,21 @@ export class MembershipDAL {
     try {
       return await this.prisma.membership.delete({
         where: { id: membershipId },
+      });
+    } catch (error) {
+      this.errorDAL.handleError(error);
+    }
+  }
+  async findMembershipByUserId(userId: number) {
+    try {
+      return await this.prisma.membership.findFirst({
+        where: {
+          userId: userId,
+          deletedAt: null,
+        },
+        include: {
+          account: true,
+        },
       });
     } catch (error) {
       this.errorDAL.handleError(error);

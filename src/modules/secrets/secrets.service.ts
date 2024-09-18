@@ -8,7 +8,7 @@ import { AccountDAL } from '../account/dal/account.dal';
 import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
 import { encrypt, decrypt } from '../../common/utils/encrypt';
-import { errorMessage } from 'src/constants/error-messages';
+import { errorMessage } from '../../constants/error-messages';
 
 @Injectable()
 export class SecretsService {
@@ -19,7 +19,6 @@ export class SecretsService {
 
   async createSecret(createSecretDto: CreateSecretsDto, accountId: number) {
     const account = await this.accountsDAL.findAccount(accountId);
-
     if (!account) {
       throw new NotFoundException(errorMessage.NOT_FOUND('account'));
     }
@@ -44,7 +43,6 @@ export class SecretsService {
     const secrets = await this.secretsDAL.findAllSecrets(accountId);
 
     const account = await this.accountsDAL.findAccount(accountId);
-
     if (!account) {
       throw new NotFoundException(errorMessage.NOT_FOUND('account'));
     }
@@ -64,7 +62,6 @@ export class SecretsService {
       throw new NotFoundException(errorMessage.NOT_FOUND('secret'));
     }
     const account = await this.accountsDAL.findAccount(accountId);
-
     if (!account) {
       throw new NotFoundException(errorMessage.NOT_FOUND('account'));
     }

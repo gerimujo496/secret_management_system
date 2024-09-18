@@ -24,7 +24,7 @@ CREATE TABLE "Memberships" (
     "user_id" INTEGER NOT NULL,
     "account_id" INTEGER NOT NULL,
     "role_id" INTEGER NOT NULL,
-    "is_confirmed" BOOLEAN,
+    "is_confirmed" BOOLEAN NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP(3),
@@ -36,6 +36,9 @@ CREATE TABLE "Memberships" (
 CREATE TABLE "Roles" (
     "id" SERIAL NOT NULL,
     "role_name" "UserRoles" NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "Roles_pkey" PRIMARY KEY ("id")
 );
@@ -44,7 +47,7 @@ CREATE TABLE "Roles" (
 CREATE TABLE "Accounts" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT,
+    "description" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -71,6 +74,9 @@ CREATE TABLE "Account_secrets" (
     "id" SERIAL NOT NULL,
     "account_id" INTEGER NOT NULL,
     "secret_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "Account_secrets_pkey" PRIMARY KEY ("id")
 );
@@ -99,10 +105,10 @@ ALTER TABLE "Memberships" ADD CONSTRAINT "Memberships_role_id_fkey" FOREIGN KEY 
 ALTER TABLE "Memberships" ADD CONSTRAINT "Memberships_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "Accounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Account_secrets" ADD CONSTRAINT "Account_secrets_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "Accounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Account_secrets" ADD CONSTRAINT "Account_secrets_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "Accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Account_secrets" ADD CONSTRAINT "Account_secrets_secret_id_fkey" FOREIGN KEY ("secret_id") REFERENCES "Secrets"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Account_secrets" ADD CONSTRAINT "Account_secrets_secret_id_fkey" FOREIGN KEY ("secret_id") REFERENCES "Secrets"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Secrets_share" ADD CONSTRAINT "Secrets_share_account_giver_id_fkey" FOREIGN KEY ("account_giver_id") REFERENCES "Accounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -11,15 +11,18 @@ import {
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dtos/create-account.dto';
-import { AuthGuard } from '../../common/guards/auth.guard';
 import { UpdateAccountDto } from './dtos/update-account.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { controller_path } from '../../constants/controller-path';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 
 @Controller(controller_path.ACCOUNT.PATH)
-@UseGuards(AuthGuard)
+@ApiBearerAuth()
+@ApiTags(controller_path.ACCOUNT.PATH)
+@UseGuards(JwtAuthGuard)
 @UseGuards(RolesGuard)
 export class AccountController {
   constructor(private accountService: AccountService) {}

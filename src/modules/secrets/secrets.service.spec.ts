@@ -6,7 +6,6 @@ import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import * as encryptUtils from '../../common/utils/encrypt';
 import {
   BadRequestException,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
@@ -35,7 +34,7 @@ describe('SecretsService', () => {
             deleteSecret: jest.fn(),
           },
         },
-        { provide: AccountDAL, useValue: { findAccountById: jest.fn() } },
+        { provide: AccountDAL, useValue: { findAccount: jest.fn() } },
       ],
     }).compile();
 

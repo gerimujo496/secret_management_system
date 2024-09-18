@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
-  IsString,
   Max,
 } from 'class-validator';
 
@@ -16,6 +15,7 @@ export class CreateSecretSharingDto {
     required: true,
   })
   expirationTime: Date;
+
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({
@@ -23,6 +23,7 @@ export class CreateSecretSharingDto {
     required: true,
   })
   accountReceiverId: number;
+
   @IsNumber()
   @IsNotEmpty()
   @Max(2)
@@ -31,6 +32,7 @@ export class CreateSecretSharingDto {
     required: true,
   })
   numberOfTries: number;
+
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({
@@ -38,6 +40,7 @@ export class CreateSecretSharingDto {
     required: true,
   })
   secretId: number;
+
   @IsNumber()
   @IsOptional()
   @ApiProperty({

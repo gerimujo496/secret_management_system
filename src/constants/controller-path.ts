@@ -8,6 +8,9 @@ export const controller_path = {
     REQUEST_RESET_PASSWORD: 'request_reset_password',
     RESET_PASSWORD_FORM: 'reset_password_form',
     RESET_PASSWORD: 'reset_password',
+    TWO_FA_AUTHENTICATE: 'two_fa_authenticate',
+    TWO_FA_INIT: 'two_fa_init',
+    TWO_FA_ACTIVATE: 'two_fa_activate',
   },
   ACCOUNT: {
     PATH: 'account',
@@ -24,12 +27,19 @@ export const controller_path = {
     REGISTER_AND_CONFIRM: 'register/confirm',
     INVITE_USER: ':accountId',
   },
-  SECRET:{
-    PATH:'secret',
-    CREATE_SECRET:':accountId/secrets',
+  SECRET: {
+    PATH: 'secret',
+    CREATE_SECRET: ':accountId/secrets',
     GET_ONE: ':accountId/:secretId',
     GET_SECRETS: ':accountId/secrets',
     UPDATE_SECRETS: ':accountId/:secretId',
-    DELETE_SECRET: ':accountId/:secretId'
-  }
+    DELETE_SECRET: ':accountId/:secretId',
+  },
+  SECRETSHARE: {
+    PATH: 'secret-sharing',
+    GET_KEY: 'get_key/:accountId',
+    CREATE_SHARE_SECRET: 'create_share_secret/:accountId',
+    GET_SHARE_SECRET_FORM: '/:secretShareId',
+    POST_NEW_SHARE_SECRET: '/:secretShareId',
+  },
 };

@@ -8,7 +8,7 @@ import { UserRoles } from '@prisma/client';
 import { MembershipDAL } from './dal/membership.dal';
 import { errorMessage } from '../../constants/error-messages';
 import { EmailService } from '../email/email.service';
-import { AuthService } from '../user/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { UserDal } from '../user/user.dal';
 
 @Injectable()
@@ -85,19 +85,14 @@ export class MembershipService {
       throw new BadRequestException(
         errorMessage.BOTH_REQUIRED('Account ID', 'User ID'),
       );
-
     const roleViewerRecord = await this.membershipDAL.findRoleRecord(
       UserRoles.VIEWER,
     );
-
     if (!roleViewerRecord) {
       throw new BadRequestException(errorMessage.INVALID_ROLE);
     }
-
     const user = await this.userDal.findByEmail(email);
-
     const admin = await this.userDal.findOneById(adminId);
-
     if (!user) {
       return this.inviteUnregisteredUser({
         accountId,
@@ -106,12 +101,10 @@ export class MembershipService {
         admin,
       });
     }
-
     const existingMembership = await this.membershipDAL.findExisitingMembership(
       user.id,
       accountId,
     );
-
     if (existingMembership) {
       throw new BadRequestException(errorMessage.MEMBERSHIP_EXISTS);
     }
@@ -119,33 +112,26 @@ export class MembershipService {
       user.id,
       accountId,
     );
-
     if (existingInvitation) {
       throw new BadRequestException(errorMessage.INVITATION_EXISTS);
     }
-
     const { confirmationToken } =
       await this.authService.updateConfirmationTokenAndReturnNewUser(user);
-
     const newMembershipData = {
       accountId,
       userId: user.id,
       roleId: roleViewerRecord.id,
     };
-
     const newMembership =
       await this.membershipDAL.createMembership(newMembershipData);
-
     await this.emailService.sendInvitationForAccountMembership({
       sender: { firstName: admin.firstName, lastName: admin.lastName },
       recipient: user.email,
       membershipId: newMembership.id,
       confirmationToken,
     });
-
     return `Your invitation to ${user.email} was successfully sent.`;
   }
-
   async inviteUnregisteredUser({
     accountId,
     roleViewerRecordId,
@@ -156,16 +142,13 @@ export class MembershipService {
       accountId,
       roleId: roleViewerRecordId,
     };
-
     const newMembership =
       await this.membershipDAL.createMembership(newMembershipData);
-
     await this.emailService.sendInvitationForAccountMembership({
       sender: { firstName: admin.firstName, lastName: admin.lastName },
       recipient: email,
       membershipId: newMembership.id,
     });
-
     return `Your invitation to ${email} was successfully sent.`;
   }
 
@@ -196,10 +179,7 @@ export class MembershipService {
         confirmationToken,
       );
 
-    const membership = await this.membershipDAL.updateMembership(
-      membershipId,
-      user.id,
-    );
+    await this.membershipDAL.updateMembership(membershipId, user.id);
 
     return {
       view: 'index',
