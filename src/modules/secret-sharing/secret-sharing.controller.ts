@@ -14,7 +14,7 @@ import { SecretSharingService } from './secret-sharing.service';
 import { CreateSecretSharingDto } from './dtos/create-secret-sharing.dto';
 import { AcceptSecretDto } from './dtos/accept-secret.dto';
 import { SecretSharingDAL } from './secret-sharing.dal';
-import { RolesGuard } from '../../common/guards/roles.guard';
+
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
 import { controller_path } from '../../constants/controller-path';
@@ -22,14 +22,13 @@ import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 
 @ApiTags(controller_path.SECRETSHARE.PATH)
 @Controller(controller_path.SECRETSHARE.PATH)
-@ApiBearerAuth()
-@UseGuards(RolesGuard)
 export class SecretSharingController {
   constructor(
     private readonly secretsSharingService: SecretSharingService,
     private readonly secretShareDAL: SecretSharingDAL,
   ) {}
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get(controller_path.SECRETSHARE.GET_KEY)
   @Roles(UserRoles.ADMIN)
@@ -37,6 +36,7 @@ export class SecretSharingController {
     return this.secretsSharingService.genereateKey(accountId);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post(controller_path.SECRETSHARE.CREATE_SHARE_SECRET)
   @Roles(UserRoles.ADMIN)
@@ -44,7 +44,6 @@ export class SecretSharingController {
     @Param('accountId', ParseIntPipe) accountId: number,
     @Body() createSecretSharingDto: CreateSecretSharingDto,
   ) {
-    console.log('calling')
     return this.secretsSharingService.shareSecret(
       createSecretSharingDto,
       accountId,

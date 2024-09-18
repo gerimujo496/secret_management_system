@@ -16,6 +16,7 @@ import { AcceptSecretDto } from './dtos/accept-secret.dto';
 import { generateSixDigitCode } from '../../common/utils/secret-sharing';
 import { errorMessage } from '../../constants/error-messages';
 import { AuthService } from '../auth/auth.service';
+
 @Injectable()
 export class SecretSharingService {
   constructor(
@@ -127,6 +128,9 @@ export class SecretSharingService {
         errorMessage.INTERNAL_SERVER_ERROR('send', 'verifcation code'),
       );
     }
+    await this.secretsSharingDAL.updateSecretSharing(secretShareId, {
+      passcode: verificationCode,
+    });
     return { message: 'Verification code email sent successfully.' };
   }
 

@@ -48,7 +48,6 @@ export class SecretSharingDAL {
         },
       });
     } catch (error) {
-      console.log(error);
       this.errorDAL.handleError(error);
     }
   }
@@ -72,7 +71,6 @@ export class SecretSharingDAL {
         data: { numberOfTries: { decrement: 1 } },
       });
     } catch (error) {
-      console.log(error);
       this.errorDAL.handleError(error);
     }
   }

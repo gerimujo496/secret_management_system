@@ -13,7 +13,6 @@ import { SecretsService } from './secrets.service';
 import { CreateSecretsDto } from './dtos/createSecrets.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
-import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
 import { controller_path } from 'src/constants/controller-path';
@@ -23,7 +22,6 @@ import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 @Controller(controller_path.SECRET.PATH)
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@UseGuards(RolesGuard)
 export class SecretsController {
   constructor(private readonly secretsService: SecretsService) {}
 

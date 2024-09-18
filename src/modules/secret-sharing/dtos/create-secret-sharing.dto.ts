@@ -35,7 +35,7 @@ export class CreateSecretSharingDto {
     required: true,
   })
   numberOfTries: number;
-  
+
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({
