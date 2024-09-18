@@ -1,23 +1,24 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ConfirmEmailDto } from './dto/confirm-email.dto';
-import { errorMessage } from '../../constants/error-messages';
-import { Entities } from '../../constants/entities';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ConfirmEmailDto } from '../auth/dto/confirm-email.dto';
+
+import { JsonValue } from '@prisma/client/runtime/library';
+import { ErrorDal } from '../../common/dal/error.dal';
 
 @Injectable()
 export class UserDal {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private errorDal: ErrorDal,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
       return await this.prisma.user.create({ data: createUserDto });
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('create', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -28,22 +29,16 @@ export class UserDal {
       });
 
       return user;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('get by email', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
   async getAllUsers() {
     try {
       return await this.prisma.user.findMany({ where: { deletedAt: null } });
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('get all', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -54,11 +49,8 @@ export class UserDal {
       });
 
       return user;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('find', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -70,11 +62,8 @@ export class UserDal {
       });
 
       return results;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('update', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -86,11 +75,8 @@ export class UserDal {
       });
 
       return results;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('reset', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 
@@ -101,11 +87,34 @@ export class UserDal {
       });
 
       return results;
-    } catch (_error) {
-      throw new HttpException(
-        errorMessage.INTERNAL_SERVER_ERROR('delete', Entities.USER),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.errorDal.handleError(error);
+    }
+  }
+
+  async setSecretKey(id: number, key: JsonValue) {
+    try {
+      const result = await this.prisma.user.update({
+        where: { id },
+        data: { twoFactorAuthenticationSecret: key },
+      });
+
+      return result;
+    } catch (error) {
+      this.errorDal.handleError(error);
+    }
+  }
+
+  async activate2Fa(id: number) {
+    try {
+      const result = await this.prisma.user.update({
+        where: { id },
+        data: { isTwoFactorAuthenticationEnabled: true },
+      });
+
+      return result;
+    } catch (error) {
+      this.errorDal.handleError(error);
     }
   }
 }

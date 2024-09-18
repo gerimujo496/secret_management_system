@@ -7,22 +7,22 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { SecretsService } from './secrets.service';
 import { CreateSecretsDto } from './dtos/createSecrets.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateSecretsDto } from './dtos/updateSecrets.dto';
-import { AuthGuard } from '../../common/guards/auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '@prisma/client';
-import { controller_path } from '../../constants/controller-path';
+import { controller_path } from 'src/constants/controller-path';
+import { JwtAuthGuard } from '../passport/jwt/jwt-auth.guard';
 
 @ApiTags(controller_path.SECRET.PATH)
 @Controller(controller_path.SECRET.PATH)
-@UseGuards(AuthGuard)
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @UseGuards(RolesGuard)
 export class SecretsController {
   constructor(private readonly secretsService: SecretsService) {}

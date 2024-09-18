@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
-import { UserModule } from './user.module';
+import { AuthService } from '../modules/auth/auth.service';
+import { UserModule } from '../modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { CreateUserDto } from './dto/create-user.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserDto } from '../modules/auth/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserDal } from './user.dal';
+import { UserDal } from '../modules/user/user.dal';
 import {
   ConflictException,
   ForbiddenException,
@@ -13,14 +12,14 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { errorMessage } from '../../constants/error-messages';
-import { AuthHelper } from './auth.helper';
-import { Entities } from '../../constants/entities';
-import { EmailService } from '../email/email.service';
-import { controller } from '../../constants/controller';
-import { controller_path } from '../../constants/controller-path';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { LogInUserDto } from './dto/login-user.dto';
+import { errorMessage } from '../constants/error-messages';
+import { AuthHelper } from '../modules/auth/auth.helper';
+import { Entities } from '../constants/entities';
+import { EmailService } from '../modules/email/email.service';
+import { controller } from '../constants/controller';
+import { controller_path } from '../constants/controller-path';
+import { ResetPasswordDto } from '../modules/auth/dto/reset-password.dto';
+import { LogInUserDto } from '../modules/auth/dto/login-user.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -29,41 +28,43 @@ describe('AuthService', () => {
   let authHelper: AuthHelper;
   let emailService: EmailService;
 
-  const user = {
+  let user = {
     firstName: 'geri',
     lastName: 'mujo',
     email: 'geri.mujo@softup.co',
     password: 'Geri.mujo1',
   } as CreateUserDto;
 
-  const createdUser = {
+  let createdUser = {
     ...user,
     id: 2,
     confirmationToken: null,
     isConfirmed: null,
-    is2FaEnabled: false,
+    twoFactorAuthenticationSecret: null,
+    isTwoFactorAuthenticationEnabled: false,
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null,
   };
 
-  const confirmedUser = {
+  let confirmedUser = {
     ...user,
     id: 2,
     confirmationToken: null,
     isConfirmed: true,
-    is2FaEnabled: false,
+    twoFactorAuthenticationSecret: null,
+    isTwoFactorAuthenticationEnabled: false,
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null,
   };
 
-  const resetPasswordDto = {
+  let resetPasswordDto = {
     password: 'Geri.mujo1',
     confirmPassword: 'Geri.mujo1',
   } as ResetPasswordDto;
 
-  const loginUserDto = {
+  let loginUserDto = {
     email: 'geri.mujo@softup.co',
     password: 'Geri.mujo1',
   } as LogInUserDto;
@@ -147,8 +148,12 @@ describe('AuthService', () => {
   it('confirmation token should be generated and user should be updated with the token', async () => {
     const token = await authHelper.generateToken({
       id: createdUser.id,
-      ...user,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
+
     jest
       .spyOn(userDal, 'update')
       .mockResolvedValue({ ...createdUser, confirmationToken: token });
@@ -166,7 +171,10 @@ describe('AuthService', () => {
   it('confirmEmail must send the email and make the update if token is valid and user exists', async () => {
     const confirmationToken = await authHelper.generateToken({
       id: createdUser.id,
-      ...user,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
 
     jest
@@ -184,14 +192,22 @@ describe('AuthService', () => {
 
     const response = await service.confirmEmail(confirmationToken);
 
-    expect(response.view).toBeDefined();
-    expect(response.view).toBe('index');
+    expect(response.message).toBeDefined();
+    expect(response.title).toBeDefined();
+
+    expect(response.message).toBe(
+      'We are happy to inform you that your account has been successfully confirmed. You can now log in and use all the features of our platform.',
+    );
+    expect(response.title).toBe('Your Account Has Been Confirmed');
   });
 
   it('confirmEmail: it should throw error if user decoded by token does not exists', async () => {
     const confirmationToken = await authHelper.generateToken({
       id: createdUser.id,
-      ...user,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
 
     jest
@@ -215,7 +231,10 @@ describe('AuthService', () => {
   it('confirmEmail: it should throw error if user decoded by token is confirmed', async () => {
     const confirmationToken = await authHelper.generateToken({
       id: createdUser.id,
-      ...user,
+      firstName: createdUser.firstName,
+      lastName: createdUser.lastName,
+      email: createdUser.email,
+      isTwoFactorAuthenticationEnabled: false,
     });
 
     jest
@@ -617,5 +636,56 @@ describe('AuthService', () => {
       expect(error instanceof UnauthorizedException).toBe(true);
       expect(error.message).toBe(errorMessage.INVALID_CREDENTIALS);
     }
+  });
+
+  it('returnUserWithoutPsw: it returns null if the user dont exists ', async () => {
+    jest.spyOn(userDal, 'findByEmail').mockResolvedValue(null);
+
+    const result = await service.returnUserWithoutPsw(loginUserDto);
+
+    expect(result).toBe(null);
+  });
+
+  it('returnUserWithoutPsw: it returns user without password ', async () => {
+    jest.spyOn(service, 'login').mockResolvedValue('cev');
+    jest
+      .spyOn(
+        service,
+        'getUserFromTokenOrThrowErrorIfTokenIsNotValidOrUserDoNotExists',
+      )
+      .mockResolvedValue(createdUser);
+    const result = await service.returnUserWithoutPsw(loginUserDto);
+
+    expect(result['password']).not.toBeDefined();
+  });
+
+  it('initTwoFa: it throws error if the user  not exists', async () => {
+    jest.spyOn(userDal, 'findOneById').mockResolvedValue(null);
+
+    try {
+      const result = await service.initTwoFa(3);
+      expect(result).not.toBeDefined();
+    } catch (error) {
+      expect(error instanceof NotFoundException).toBe(true);
+    }
+  });
+
+  it('verify2FaCodeOrThrowError: throws error if code is not valid', async () => {
+    jest.spyOn(authHelper, 'validateToken').mockResolvedValue(false);
+
+    try {
+      const result = service.verify2FaCodeOrThrowError({}, 23);
+      expect(result).not.toBeDefined();
+    } catch (error) {
+      expect(error instanceof UnauthorizedException).toBe(true);
+      expect(error.message).toBe(errorMessage.WRONG_AUTH_CODE);
+    }
+  });
+
+  it('verify2FaCodeOrThrowError: throws error if code is not valid', async () => {
+    jest.spyOn(authHelper, 'validateToken').mockResolvedValue(true);
+
+    const result = service.verify2FaCodeOrThrowError('fe', 234);
+    expect(result).not.toBeDefined();
   });
 });

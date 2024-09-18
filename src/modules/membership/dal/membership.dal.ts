@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UserRoles } from '@prisma/client';
 import { ErrorDal } from '../../../common/dal/error.dal';
-import { PrismaService } from '../../../modules/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import e from 'express';
 
 @Injectable()
 export class MembershipDAL {
@@ -192,9 +193,13 @@ export class MembershipDAL {
   }
   async findMembershipByUserId(userId: number) {
     try {
+      const role = await this.prisma.role.findFirst({
+        where: { roleName: 'ADMIN' },
+      });
       return await this.prisma.membership.findFirst({
         where: {
           userId: userId,
+          roleId: role.id,
           deletedAt: null,
         },
         include: {
