@@ -127,6 +127,7 @@ export class SecretSharingService {
         errorMessage.INTERNAL_SERVER_ERROR('send', 'verifcation code'),
       );
     }
+  
     return { message: 'Verification code email sent successfully.' };
   }
 
