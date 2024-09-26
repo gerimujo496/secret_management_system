@@ -39,7 +39,7 @@ export class MembershipService {
       roleUpperCase !== UserRoles.EDITOR &&
       roleUpperCase !== UserRoles.VIEWER
     ) {
-      return new BadRequestException(errorMessage.INVALID_ROLE);
+      throw new BadRequestException(errorMessage.INVALID_ROLE);
     }
 
     const notAdminMembership = await this.membershipDAL.findNotAdminMembership(
@@ -139,6 +139,7 @@ export class MembershipService {
     });
     return `Your invitation to ${user.email} was successfully sent.`;
   }
+
   async inviteUnregisteredUser({
     accountId,
     roleViewerRecordId,
@@ -193,10 +194,6 @@ export class MembershipService {
       title: 'Your invitation was accepted',
       message: 'Welcome to the club.',
     };
-  }
-
-  async updateTest(id: number, userId: number) {
-    return await this.membershipDAL.updateMembership(id, userId);
   }
 
   async confirmInvitation(membershipId: number, token: string) {
