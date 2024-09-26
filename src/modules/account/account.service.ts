@@ -102,7 +102,7 @@ export class AccountService {
       await this.accountDAL.findAllMembershipsForAccount(accountId);
 
     if (memberships.length === 0) {
-      return new NotFoundException(errorMessage.INVALID_ENTITY('account'));
+      throw new NotFoundException(errorMessage.INVALID_ENTITY('account'));
     }
 
     const [deletedAccount, deletedMemberships] =
