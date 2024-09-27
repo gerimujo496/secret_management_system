@@ -463,8 +463,6 @@ describe('MembershipDAL', () => {
     expect(errorDAL.handleError).toHaveBeenCalledWith(error);
   });
 
-  // Working on now
-
   it('should return null if no membership by userID found', async () => {
     const userId = 2;
 
