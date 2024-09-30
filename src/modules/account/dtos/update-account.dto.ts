@@ -7,12 +7,12 @@ export class UpdateAccountDto {
   @MaxLength(55)
   @IsString()
   @IsOptional()
-  name: string;
+  name?: string;
 
   @ApiProperty()
   @IsString()
   @MinLength(5)
   @MaxLength(255)
   @IsOptional()
-  description: string;
+  description?: string;
 }
